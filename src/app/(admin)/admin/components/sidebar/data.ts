@@ -9,28 +9,28 @@ const data: SidebarData = [
     },
     {
         text: "categories",
-        href: "/categories",
+        href: "/admin/categories",
         icon:List
     },
     {
         text: "orders",
-        href: "/orders",
+        href: "/admin/orders",
         icon: LucideShoppingCart
     },
     {
         text:"customers",
-        href: "/customers",
+        href: "/admin/customers",
         icon: Users
     },
     "Products",
     {
         text: "products",
-        href: "/products",
+        href: "/admin/products",
         icon: Cuboid
     },
     {
         text: "add product",
-        href:"/products/create-product",
+        href:"/admin/products/create-product",
         icon:PlusCircleIcon
     },
    
