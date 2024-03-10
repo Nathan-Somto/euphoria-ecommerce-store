@@ -4,6 +4,7 @@ import { Open_Sans } from "next/font/google";
 import Sidebar from "./components/sidebar";
 import Header from "./components/header";
 import "@/app/globals.css";
+import {Toaster} from "react-hot-toast";
 export const metadata: Metadata = {
   title: "Euphoria Admin Dashboard",
   description: "Admin Dashboard for Euphoria Store",
@@ -19,12 +20,15 @@ export default function AdminLayout({
 }) {
   return (
     <html lang="en">
-      <body
-        className={`${open_sans.className}`}
-      >
+      <body className={`${open_sans.className}`}>
         <Sidebar isDesktop />
         <Header />
-        <main className="lg:ml-[270px] w-full min-h-screen px-4 lg:w-[calc(100%-270px)] mr-auto mt-[68px] bg-[#F3F4F8]">{children}</main>
+        <main className="lg:ml-[270px] w-full min-h-screen px-4 lg:w-[calc(100%-270px)] mr-auto mt-[68px] bg-[#F3F4F8]">
+          {children}
+        </main>
+        <Toaster
+        position="bottom-right"
+        />
       </body>
     </html>
   );

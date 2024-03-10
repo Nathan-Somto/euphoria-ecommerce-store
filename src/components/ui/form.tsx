@@ -12,6 +12,7 @@ import {
 
 import { cn } from "@/lib/utils"
 import { Label } from "@/components/ui/label"
+import { Input } from "./input"
 
 const Form = FormProvider
 
@@ -163,6 +164,20 @@ const FormMessage = React.forwardRef<
   )
 })
 FormMessage.displayName = "FormMessage"
+const FormInput = React.forwardRef<HTMLInputElement, React.InputHTMLAttributes<HTMLInputElement>>(({
+  className, children, ...props}, ref) => {
+    const {error} = useFormField();
+    return (
+      <Input 
+      ref={ref} 
+      className={cn(error && "border-destructive text-destructive ring-offset-destructive placeholder:text-destructive active:border-destructive focus:border-destructive ring-2", className)}  
+      {...props}
+      />
+    )
+  }
+);
+FormInput.displayName = "FormInput"
+
 
 export {
   useFormField,
@@ -172,5 +187,6 @@ export {
   FormControl,
   FormDescription,
   FormMessage,
+  FormInput,
   FormField,
 }
