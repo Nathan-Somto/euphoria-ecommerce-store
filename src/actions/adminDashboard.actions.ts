@@ -71,7 +71,7 @@ export async function getRevenueChartData() {
     });
     return revenueData;
   } catch (err) {
-    console.log(err.message);
+    errorLogger(err);
     return [];
   }
 }
@@ -106,7 +106,32 @@ export async function getTotalRevenueAndSales(){
         return [0,0];
     }
 }
+/* export async function getProductChartData() {
+  try {
+    const productData = []
+    // get at most 10 orders
+    const orders = await prisma?.order.findMany({
+      where: {
+        OR: [{ status: "DELIVERED" }, { status: "SHIPPED" }],
+      },
+      select: {
+        status: true,
+        createdAt: true,
+        products: {
+          select: {
+            price: true,
+            units: true
+          },
+        },
+      },
+    });
+    // extract the products from each order
+    // increment the quantity for a product
+  }
+  catch(err){
 
+  }
+} */
 export async function getActiveUsers(){
     try{
         const activeUsers = await prisma.user.count({

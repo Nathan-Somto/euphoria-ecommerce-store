@@ -30,7 +30,7 @@ const data: SidebarData = [
     },
     {
         text: "add product",
-        href:"/admin/products/create-product",
+        href:"/admin/products/new",
         icon:PlusCircleIcon
     },
    

@@ -33,7 +33,7 @@ type CategoryFormProps = {
 };
 type  HeadingProps = {
     title: string;
-    description: string;
+    description?: string;
   }
 type CellActionProps = {
   id: string;
@@ -47,4 +47,13 @@ type CustomDialogProps = {
   open?: boolean,
   text?: string,
   withTrigger?: boolean
+}
+type ProductFormProps = {
+  forEdit: boolean;
+  productId: string;
+  categoryNames: string[];
+}
+type ProductFormButtonProps = {
+  forEdit: boolean;
+  pending:boolean;
 }
