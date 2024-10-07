@@ -2,6 +2,7 @@ import kpiData from "./components/kpi-card/data";
 import KpiCard from "./components/kpi-card";
 import { v4 as uuidv4 } from "uuid";
 import RevenueChart from "./components/revenue-chart";
+import ProductChart from "./components/product-chart";
 const data = [
   {
     name: "January",
@@ -48,6 +49,21 @@ const data = [
     total: 34250
   }
 ];
+const productData = [{
+  name: "White Shirt",
+  total: 15
+}, {
+  name: "Flashy Hats",
+  total:10
+}, {
+  name :"Sexy Hoodie",
+  total: 4
+},
+{
+  name: "Manly Sneakers",
+  total:12
+}
+]
 export default function AdminDashboardPage() {
   const contents = [125000000, 34, 41, 5];
   const refinedData = kpiData.map((item, i) => ({
@@ -62,6 +78,7 @@ export default function AdminDashboardPage() {
         ))}
       </div>
       <RevenueChart chartData={data} />
+      <ProductChart chartData={productData}/>
     </div>
   );
 }

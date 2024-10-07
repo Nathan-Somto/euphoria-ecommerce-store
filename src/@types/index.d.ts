@@ -19,6 +19,7 @@ type RevenueChartProps = {
     [x: string]: string | number;
   }[];
 };
+type ProductChartProps = RevenueChartProps;
 type NotificationBadgeProps = {
   value: string | number;
   size?: number;

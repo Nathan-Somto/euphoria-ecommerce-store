@@ -12,7 +12,7 @@ export default function KpiCard ({title, content, Icon, format}:KpiCardProps & {
       </CardTitle>
       <Icon className="h-4 w-4 text-muted-foreground" />
     </CardHeader>
-    <CardContent className="text-ellipsis w-full">
+    <CardContent className="text-ellipsis truncate w-full">
       <p className="text-2xl font-bold">{ format ? formatter.format(content): content}</p>
     </CardContent>
   </Card>
