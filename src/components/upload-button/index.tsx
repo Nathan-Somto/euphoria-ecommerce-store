@@ -1,18 +1,16 @@
 "use client";
 import { CldUploadWidget } from "next-cloudinary";
 import { ImageIcon, TrashIcon } from "lucide-react";
-import { Button } from "../ui/button";
-import Image from "next/image";
+import { v4 as uuidV4 } from "uuid";
+import { Button } from "@/components/ui/button";
 export type ImageVal = {
   id: string;
   url: string;
 };
-function getId() {
-  return Math.random().toString(36).substring(7);
-}
+
 export function convertToImageVals(val: string[]): ImageVal[] {
   return val.map((url) => ({
-    id: getId(),
+    id: uuidV4(),
     url,
   }));
 }
@@ -31,9 +29,8 @@ export function UploadButton({ onChange, onRemove, disabled, values }: Props) {
           if (typeof res.info !== "string") {
             if (res.info) {
               // create an id for the image
-              const id = Math.random().toString(36).substring(7);
               onChange({
-                id,
+                id: uuidV4(),
                 url: res.info.secure_url,
               });
             }
@@ -42,7 +39,12 @@ export function UploadButton({ onChange, onRemove, disabled, values }: Props) {
       >
         {({ open }) => {
           return (
-            <Button variant={"secondary"} onClick={() => open()}>
+            <Button
+              variant={"secondary"}
+              disabled={disabled}
+              onClick={() => open()}
+              type="button"
+            >
               <ImageIcon className="mr-2" /> Upload Image
             </Button>
           );
@@ -52,12 +54,13 @@ export function UploadButton({ onChange, onRemove, disabled, values }: Props) {
       <div className="flex flex-wrap gap-2.5 mt-4">
         {values.map((value) => (
           <div key={value.id} className="relative">
-            <Image
+            <img
               src={value.url}
               className="w-40 h-40 object-cover rounded-lg aspect-square "
               alt="product"
             />
             <Button
+              type="button"
               variant="destructive"
               className="absolute top-0 right-0"
               onClick={() => onRemove && onRemove(value.id)}
