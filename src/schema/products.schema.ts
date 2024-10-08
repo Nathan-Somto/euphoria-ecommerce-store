@@ -5,7 +5,7 @@ const productSchema = z.object({
     description: z.string().min(10),
     discountRate: z.coerce.number().optional(),
     colors: z.array(z.string().startsWith('#').min(3)),
-    category: z.string(),
+    categoryId: z.string(),
     images: z.array(z.string()),
     isFeatured: z.boolean(),
     isArchived: z.boolean(),
