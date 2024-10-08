@@ -22,7 +22,6 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import MultiSelector from "@/components/ui/multi-select";
 import { ProductSchema, productSchema } from "@/schema/products.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -30,7 +29,13 @@ import { v4 as uuidv4 } from "uuid";
 import { Trash } from "lucide-react";
 import { createProduct, updateProduct } from "@/actions/products.actions";
 import { toast } from "react-hot-toast";
-import {useRouter} from "next/navigation";
+import MultiSelect from "react-select";
+import { useRouter } from "next/navigation";
+import {
+  convertToImageVals,
+  ImageVal,
+  UploadButton,
+} from "@/components/upload-button";
 type Props = ProductFormProps & {
   initialData?: ProductSchema;
 };
@@ -41,6 +46,7 @@ function ProductFormButton({ forEdit, pending }: ProductFormButtonProps) {
     </Button>
   );
 }
+
 export default function ProductForm({
   forEdit = false,
   initialData = {
@@ -57,7 +63,11 @@ export default function ProductForm({
   categoryNames: category,
   productId,
 }: Props) {
-   const actionMethod =  forEdit ? updateProduct : createProduct;
+  const actionMethod = forEdit ? updateProduct : createProduct;
+  const [imageData, setImageData] = React.useState<ImageVal[]>([]);
+  React.useEffect(() => {
+    setImageData(convertToImageVals(initialData.images));
+  }, []);
   const router = useRouter();
   const [isDiscounted, setIsDiscounted] = React.useState<boolean>(false);
   const form = useForm<ProductSchema>({
@@ -73,18 +83,32 @@ export default function ProductForm({
     { label: "XL (Extra Large)", value: "XL" },
     { label: "XXL (Extra Extra Large)", value: "XXL" },
   ];
+  const handleImageChange = (val: ImageVal) => {
+    setImageData([...imageData, val]);
+  };
+  const handleImageRemove = (id: string) => {
+    setImageData(imageData.filter((image) => image.id !== id));
+  };
   return (
     <Form {...form}>
-      <form className="space-y-10"  onSubmit={form.handleSubmit(async (data) => {
-        try{
-          const {message} = await actionMethod(data, productId);
-          toast.success(message);
-          form.reset();
-
-        }catch(err){
-          toast.error((err as Error).message)
-        }
-        })}>
+      <form
+        className="space-y-10"
+        onSubmit={form.handleSubmit(async (data) => {
+          try {
+            const { message } = await actionMethod(data, productId);
+            toast.success(message);
+            form.reset();
+          } catch (err) {
+            toast.error((err as Error).message);
+          }
+        })}
+      >
+        <UploadButton
+          onChange={handleImageChange}
+          onRemove={handleImageRemove}
+          values={imageData}
+          disabled={form.formState.isLoading || form.formState.isSubmitting}
+        />
         <div className="grid md:grid-cols-2 gap-8 lg:gap-10">
           <FormField
             control={form.control}
@@ -106,7 +130,7 @@ export default function ProductForm({
               <FormItem>
                 <FormLabel>Price</FormLabel>
                 <FormControl>
-                  <FormInput placeholder="₦35,000" {...field}  type="number" />
+                  <FormInput placeholder="₦35,000" {...field} type="number" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -146,18 +170,35 @@ export default function ProductForm({
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Sizes</FormLabel>
-                <MultiSelector
+                <MultiSelect
+                  defaultValue={initialData.sizes}
+                  isMulti
+                  options={sizes}
                   value={field.value}
-                  onChange={field.onChange}
-                  defaultOptions={sizes}
-                  hidePlaceholderWhenSelected
-                  className="bg-background"
-                  placeholder="Select Sizes for the product..."
-                  emptyIndicator={
+                  onChange={(value) => field.onChange(value)}
+                  placeholder="Select Sizes"
+                  classNamePrefix="custom-select"
+                  className="disabled:cursor-not-allowed disabled:opacity-50"
+                  styles={{
+                    control: (provided, state) => ({
+                      ...provided,
+                      borderColor: state.isFocused
+                        ? "var(--ring)"
+                        : "var(--input)",
+                      outline: "none",
+                      boxShadow: state.isFocused
+                        ? "0 0 0 2px #000"
+                        : "none",
+                      "&:hover": {
+                        borderColor: "#000",
+                      },
+                    }),
+                  }}
+                  noOptionsMessage={() => (
                     <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
                       no results found.
                     </p>
-                  }
+                  )}
                 />
               </FormItem>
             )}
@@ -305,7 +346,10 @@ export default function ProductForm({
             />
           )}
         </div>
-        <ProductFormButton forEdit={forEdit} pending={form.formState.isLoading || form.formState.isSubmitting} />
+        <ProductFormButton
+          forEdit={forEdit}
+          pending={form.formState.isLoading || form.formState.isSubmitting}
+        />
       </form>
     </Form>
   );
