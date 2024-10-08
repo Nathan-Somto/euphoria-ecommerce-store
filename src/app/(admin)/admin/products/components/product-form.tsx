@@ -50,7 +50,7 @@ function ProductFormButton({ forEdit, pending }: ProductFormButtonProps) {
 export default function ProductForm({
   forEdit = false,
   initialData = {
-    category: "",
+    categoryId: "",
     colors: [],
     description: "",
     images: [],
@@ -60,7 +60,7 @@ export default function ProductForm({
     isFeatured: false,
     price: 35_000,
   },
-  categoryNames: category,
+  categories,
   productId,
 }: Props) {
   const actionMethod = forEdit ? updateProduct : createProduct;
@@ -84,7 +84,7 @@ export default function ProductForm({
     { label: "XXL (Extra Extra Large)", value: "XXL" },
   ];
   const handleImageChange = (val: ImageVal) => {
-    setImageData([...imageData, val]);
+    setImageData(prev => ([...prev, val]));
   };
   const handleImageRemove = (id: string) => {
     setImageData(imageData.filter((image) => image.id !== id));
@@ -95,9 +95,13 @@ export default function ProductForm({
         className="space-y-10"
         onSubmit={form.handleSubmit(async (data) => {
           try {
-            const { message } = await actionMethod(data, productId);
-            toast.success(message);
+            const modifiedData = {
+              ...data,
+              images: imageData.map((image) => image.url),
+            }
+            await actionMethod(modifiedData, productId);
             form.reset();
+            router.push("/admin/products");
           } catch (err) {
             toast.error((err as Error).message);
           }
@@ -138,7 +142,7 @@ export default function ProductForm({
           />
           <FormField
             control={form.control}
-            name="category"
+            name="categoryId"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Category</FormLabel>
@@ -152,9 +156,9 @@ export default function ProductForm({
                   <SelectContent>
                     <SelectGroup>
                       <SelectLabel>Category</SelectLabel>
-                      {category.map((value) => (
-                        <SelectItem value={value} key={uuidv4()}>
-                          {value}
+                      {categories.map((value) => (
+                        <SelectItem value={value.id} key={value.id}>
+                          {value.name}
                         </SelectItem>
                       ))}
                     </SelectGroup>
