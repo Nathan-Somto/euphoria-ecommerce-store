@@ -1,5 +1,6 @@
 "use server";
 import prisma from "@/lib/prisma";
+import { errorLogger } from "@/utils/errorLogger";
 
 export async function getRevenueChartData() {
   try {

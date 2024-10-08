@@ -27,34 +27,44 @@ type NotificationBadgeProps = {
 };
 type CategoryFormProps = {
   initialData?: {
-    name:string | undefined;
-  },
-  categoryNames: string[]
+    name: string | undefined;
+  };
+  categoryNames: string[];
   categoryId?: string;
 };
-type  HeadingProps = {
-    title: string;
-    description?: string;
-  }
+type HeadingProps = {
+  title: string;
+  description?: string;
+};
 type CellActionProps = {
   id: string;
   name: string;
   createdAt: Date;
   products: {
-      id: string;
+    id: string;
   }[];
 };
 type CustomDialogProps = {
-  open?: boolean,
-  text?: string,
-  withTrigger?: boolean
-}
+  open?: boolean;
+  text?: string;
+  withTrigger?: boolean;
+};
 type ProductFormProps = {
   forEdit: boolean;
   productId: string;
-  categoryNames: string[];
-}
+  categories: { id: string; name: string }[];
+};
 type ProductFormButtonProps = {
   forEdit: boolean;
-  pending:boolean;
-}
+  pending: boolean;
+};
+type SearchBarProps = {
+  onChange: (value: string) => void;
+  value: string;
+  placeholder?: string;
+  useDebounce?: boolean;
+  debounceTime?: number;
+};
+type ServerActionReturnType<
+  T extends (...args: any) => Promise<any | undefined>
+> = Exclude<Awaited<ReturnType<T>>["data"], undefined>;
