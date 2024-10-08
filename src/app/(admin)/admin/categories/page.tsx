@@ -5,7 +5,7 @@ import { getCategories } from "@/actions/categories.actions";
 import CategoryClient from "./components/category-client";
 
 export default async function CategoryPage() {
-  const { data: categories } = await getCategories();
+  const { data: categories } = await getCategories(true);
   return (
     <div className="py-5 px-4">
       <div className="flex items-center justify-between mb-8">
