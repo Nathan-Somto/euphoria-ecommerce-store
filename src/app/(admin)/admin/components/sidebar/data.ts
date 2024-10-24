@@ -14,7 +14,7 @@ const data: SidebarData = [
     },
     {
         text: "orders",
-        href: "/admin/orders",
+        href: "/admin/orders?page=1",
         icon: LucideShoppingCart
     },
     {

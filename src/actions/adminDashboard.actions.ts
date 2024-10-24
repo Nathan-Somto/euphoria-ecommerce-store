@@ -52,7 +52,7 @@ export async function getRevenueChartData() {
     ];
     const orders = await prisma?.order.findMany({
       where: {
-        OR: [{ status: "DELIVERED" }, { status: "SHIPPED" }],
+        OR: [{ status: "DELIVERED" }, { status: "PAID" }],
       },
       select: {
         status: true,
@@ -83,7 +83,7 @@ export async function getTotalRevenueAndSales(){
         // Total Revenue
         const orders =  await prisma?.order.findMany({
             where: {
-              OR: [{ status: "DELIVERED" }, { status: "SHIPPED" }],
+              OR: [{ status: "DELIVERED" }, { status: "PAID" }],
             },
             select: {
               status: true,

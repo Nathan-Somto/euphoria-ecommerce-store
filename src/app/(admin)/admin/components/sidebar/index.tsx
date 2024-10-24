@@ -5,6 +5,9 @@ import sidebarData from "./data";
 import { v4 as uuidv4 } from "uuid";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+const removeQueryParams = (pathname: string) => {
+  return pathname.split("?")[0];
+}
 export default function Sidebar({ isDesktop=true, isMobile=false }: SidebarProps) {
   const pathname = usePathname();
   return (
@@ -39,7 +42,7 @@ export default function Sidebar({ isDesktop=true, isMobile=false }: SidebarProps
                 key={uuidv4()}
                 className={cn(
                   "hover:bg-[#F3F4F8] hover:text-black/90 text-[#8B909A] font-semibold rounded-sm py-3.5 px-3",
-                  pathname === item.href && "text-black/90"
+                  (removeQueryParams(pathname) === removeQueryParams(item.href)) && "text-black/90"
                 )}
               >
                 <Link

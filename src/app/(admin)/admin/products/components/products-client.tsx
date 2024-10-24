@@ -11,10 +11,6 @@ import { deleteProduct } from "@/actions/products.actions";
 import ProductCard from "./product-card";
 import { ProductsClientProps, ProductTable } from ".";
 
-const images = [
-  "https://www.meshki.us/cdn/shop/files/MESHKI_ECOM_CAPSULEDROP_03_04_DAY01_KATIE-S04_065.jpg?v=1725317837",
-  "https://www.ivorygem.com/cdn/shop/products/a46b6b0140e04f76b55a5ce5769648f8-Max_2400x.jpg?v=1685669192",
-];
 function ProductsClient({ adminProducts }: ProductsClientProps) {
   const [products, setProducts] = React.useState<ProductTable[]>([]);
   const [filterValue, setFilterValue] = React.useState("");

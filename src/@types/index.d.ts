@@ -68,3 +68,12 @@ type SearchBarProps = {
 type ServerActionReturnType<
   T extends (...args: any) => Promise<any | undefined>
 > = Exclude<Awaited<ReturnType<T>>["data"], undefined>;
+
+type PaginationProps = {
+  currentPage: number;
+  totalPages: number;
+  onNext: () => void;
+  onPrevious: () => void;
+  disableNext?: boolean;
+  disablePrevious?: boolean;
+};

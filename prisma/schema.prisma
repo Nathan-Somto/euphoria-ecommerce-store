@@ -92,7 +92,7 @@ model Product {
   name         String
   description  String
   price        Float
-  units        Int       @default(1)
+  units        Int       @default(1) // to track stock level
   colors       String[]
   inStock      Boolean   @default(true)
   isFeatured   Boolean   @default(false)
@@ -104,26 +104,34 @@ model Product {
   categoryId   String
   WishList     WishList? @relation(fields: [wishListId], references: [id])
   wishListId   String?
-  Order        Order?    @relation(fields: [orderId], references: [id])
-  orderId      String?
+  OrderedProduct OrderedProduct[]
 }
 
 model Order {
-  id        String    @id @default(uuid()) @map("_id")
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  user      User      @relation(fields: [userId], references: [id])
-  userId    String
-  products  Product[]
-  status    Status
-  address   String
+  id              String           @id @default(uuid()) @map("_id")
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  user            User             @relation(fields: [userId], references: [id])
+  userId          String
+  orderedProducts OrderedProduct[]
+  status          Status
+  address         String
+}
+
+model OrderedProduct {
+  id        String   @id @default(uuid()) @map("_id")
+  productId String?
+  Product   Product? @relation(fields: [productId], references: [id])
+  quantity  Int      @default(1)
+  Order     Order?   @relation(fields: [orderId], references: [id])
+  orderId   String?
 }
 
 enum Status {
   PENDING
-  SHIPPED
   DELIVERED
   CANCELLED
+  PAID
 }
 
 enum Size {
