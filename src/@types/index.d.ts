@@ -64,6 +64,8 @@ type SearchBarProps = {
   placeholder?: string;
   useDebounce?: boolean;
   debounceTime?: number;
+  containerClassName?: string; 
+  inputClassName?: string;
 };
 type ServerActionReturnType<
   T extends (...args: any) => Promise<any | undefined>
@@ -77,3 +79,10 @@ type PaginationProps = {
   disableNext?: boolean;
   disablePrevious?: boolean;
 };
+type FooterDownloadBtnProps = {
+  store: string;
+  link: string;
+  image: string;
+  alt: string;
+  subTxt: string;
+}

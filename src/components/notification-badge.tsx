@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 import React from "react";
 
-export default function notificationBadge({
+export default function NotificationBadge({
     value,
     size=24,
     className=''
