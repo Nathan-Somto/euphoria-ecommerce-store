@@ -3,7 +3,7 @@ import { LucideFacebook, LucideLinkedin, InstagramIcon, TwitterIcon } from 'luci
 import React, { useEffect, useState } from 'react';
 import FooterDownloadBtn from './footer-downloadbtn';
 import { motion } from 'framer-motion';
-import { useRouter } from 'next/router';
+import { usePathname } from 'next/navigation';
 
 const footerData = [
     {
@@ -65,11 +65,11 @@ const downloadLinks = [
 
 export default function Footer() {
     const [restartView, setRestartView] = useState(false);
-    const router = useRouter();
+    const pathname = usePathname();
 
     useEffect(() => {
         setRestartView((prev) => !prev);
-    }, [router.pathname]);
+    }, [pathname]);
 
     return (
         <motion.footer
