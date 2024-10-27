@@ -1,7 +1,6 @@
 'use client';
 import React, { useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Progress } from '../ui/progress';
 import { cn } from '@/lib/utils';
 
 type CarouselProps = {
