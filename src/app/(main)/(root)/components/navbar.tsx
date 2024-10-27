@@ -58,7 +58,7 @@ export default function Navbar() {
     const navItems = mobileNavItems(null)
     return (
         <>
-            <nav className="flex items-center border-b-[1.5px] border-b-disabled h-20 z-[900000] py-6 w-full px-3 sm:px-7 justify-between fixed lg:top-0 bg-white lg:w-full  inset-x-0">
+            <nav className="flex items-center border-b-[1.5px] border-b-disabled h-20 z-[900000] py-6 w-full px-3 sm:px-7 justify-between fixed top-0 bg-white lg:w-full  inset-x-0">
                 <Link href='/'>
                     <Image src={'/Logo.svg'} alt="euphoria logo" className="w-[50px] h-[40px] sm:w-[90px] sm:h-[45px] object-contain" height={45} width={90} />
                 </Link>
