@@ -58,19 +58,21 @@ model PasswordResetToken {
 model Category {
   id        String    @id @default(uuid()) @map("_id")
   name      String    @unique
+  image     String?
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   products  Product[]
 }
 
 model WishList {
-  id        String    @id @default(uuid()) @map("_id")
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  deletedAt DateTime?
-  user      User      @relation(fields: [userId], references: [id])
-  userId    String
-  products  Product[]
+  id         String    @id @default(uuid()) @map("_id") @db.ObjectId
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  deletedAt  DateTime?
+  user       User      @relation(fields: [userId], references: [id])
+  userId     String
+  productIds String[]  @db.ObjectId
+  products   Product[] @relation(fields: [productIds], references: [id])
 }
 
 model Address {
@@ -86,25 +88,25 @@ model Address {
 }
 
 model Product {
-  id           String    @id @default(uuid()) @map("_id")
-  images       String[]
-  size         Size[]
-  name         String
-  description  String
-  price        Float
-  units        Int       @default(1) // to track stock level
-  colors       String[]
-  inStock      Boolean   @default(true)
-  isFeatured   Boolean   @default(false)
-  isArchived   Boolean   @default(false)
-  discountRate Int?
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
-  category     Category  @relation(fields: [categoryId], references: [id])
-  categoryId   String
-  WishList     WishList? @relation(fields: [wishListId], references: [id])
-  wishListId   String?
+  id             String           @id @default(uuid()) @map("_id") @db.ObjectId
+  images         String[]
+  size           Size[]
+  name           String
+  description    String
+  price          Float
+  units          Int              @default(1) 
+  colors         String[]
+  inStock        Boolean          @default(true)
+  isFeatured     Boolean          @default(false)
+  isArchived     Boolean          @default(false)
+  discountRate   Int?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  category       Category         @relation(fields: [categoryId], references: [id])
+  categoryId     String
   OrderedProduct OrderedProduct[]
+  wishListIds    String[]         @db.ObjectId // many to many relationship with wishList
+  wishLists      WishList[]       @relation(fields: [wishListIds], references: [id])
 }
 
 model Order {
@@ -120,11 +122,30 @@ model Order {
 
 model OrderedProduct {
   id        String   @id @default(uuid()) @map("_id")
-  productId String?
+  productId String?  @db.ObjectId
   Product   Product? @relation(fields: [productId], references: [id])
   quantity  Int      @default(1)
   Order     Order?   @relation(fields: [orderId], references: [id])
   orderId   String?
+}
+
+model Banner {
+  id            String   @id @default(uuid()) @map("_id")
+  discountRate  Int?
+  discountColor String?
+  title         String
+  description   String
+  buttonText    String
+  createdAt     DateTime @default(now())
+}
+
+model Testimonial {
+  id        String   @id @default(uuid()) @map("_id")
+  rating    Int
+  message   String
+  image     String
+  name      String
+  createdAt DateTime @default(now())
 }
 
 enum Status {
