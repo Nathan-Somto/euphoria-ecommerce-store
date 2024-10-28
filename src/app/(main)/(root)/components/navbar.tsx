@@ -1,7 +1,7 @@
 'use client';
 import SearchBar from "@/components/search-bar";
 import { Button } from "@/components/ui/button";
-import {HeartIcon, ShoppingCart, User2Icon } from "lucide-react";
+import { HeartIcon, ShoppingCart, User2Icon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -37,7 +37,7 @@ export default function Navbar() {
         if (search) {
             setSearchValue(search)
         }
-    },[
+    }, [
         searchParams.get('search')
     ]);
     const handleChange = (value: string) => {
@@ -62,8 +62,7 @@ export default function Navbar() {
         document.querySelector('body')?.classList.toggle('overflow-hidden')
         setMobileNavOpen(val)
     }
-    const isAuth = pathname.includes('auth');
-    const isLoggedIn = isAuth ? pathname.includes('login') : false;
+    const isLoggedIn = false;
     const navItems = mobileNavItems(null)
     return (
         <>
@@ -89,40 +88,44 @@ export default function Navbar() {
                     </div>
                 </div>
                 <div className="flex gap-x-2">
-                    <Button
-                        variant={'neutral'}
-                        size='icon'
-                        className="hidden lg:flex data-[active=true]:text-primary"
-                        data-active={'/favourites' === pathname}
-                        onClick={() => router.push(isLoggedIn ? '/dashboard/wishlist' : '/auth/login')}
-                    >
-                        <HeartIcon aria-labelledby="favourites"  >
-                            <title id="favourites">favourites</title>
-                        </HeartIcon>
-                    </Button>
-                    <Button
-                        variant={'neutral'}
-                        size='icon'
-                        className="hidden lg:flex data-[active=true]:text-primary"
-                        data-active={'/dashboard' === pathname}
-                        onClick={() => router.push(isLoggedIn ? '/dashboard' : '/auth/login')}
-                    >
-                        <User2Icon aria-labelledby="account">
-                            <title id="account">account</title>
-                        </User2Icon>
-                    </Button>
-                    <Button
-                        variant={'neutral'}
-                        size='icon'
-                        className="relative data-[active=true]:text-primary"
-                        data-active={'/cart' === pathname}
-                        onClick={() => router.push(isLoggedIn ? '/cart' : '/auth/login')}
-                    >
-                        <ShoppingCart aria-labelledby="cart">
-                            <title id="cart">cart</title>
-                        </ShoppingCart>
-                        <NotificationBadge value={5} size={20} />
-                    </Button>
+                    {isLoggedIn && (
+                        <>
+                            <Button
+                                variant={'neutral'}
+                                size='icon'
+                                className="hidden lg:flex data-[active=true]:text-primary"
+                                data-active={'/favourites' === pathname}
+                                onClick={() => router.push(isLoggedIn ? '/dashboard/wishlist' : '/auth/login')}
+                            >
+                                <HeartIcon aria-labelledby="favourites"  >
+                                    <title id="favourites">favourites</title>
+                                </HeartIcon>
+                            </Button>
+                            <Button
+                                variant={'neutral'}
+                                size='icon'
+                                className="hidden lg:flex data-[active=true]:text-primary"
+                                data-active={'/dashboard' === pathname}
+                                onClick={() => router.push(isLoggedIn ? '/dashboard' : '/auth/login')}
+                            >
+                                <User2Icon aria-labelledby="account">
+                                    <title id="account">account</title>
+                                </User2Icon>
+                            </Button>
+                            <Button
+                                variant={'neutral'}
+                                size='icon'
+                                className="relative data-[active=true]:text-primary"
+                                data-active={'/cart' === pathname}
+                                onClick={() => router.push(isLoggedIn ? '/cart' : '/auth/login')}
+                            >
+                                <ShoppingCart aria-labelledby="cart">
+                                    <title id="cart">cart</title>
+                                </ShoppingCart>
+                                <NotificationBadge value={5} size={20} />
+                            </Button>
+                        </>
+                    )}
                     <motion.div
                         whileTap={{ scale: 0.85 }}
                         className="lg:hidden flex flex-col justify-center cursor-pointer sm:ml-4 ml-1.5"
@@ -142,11 +145,10 @@ export default function Navbar() {
                         ></motion.div>
                     </motion.div>
                 </div>
-                {isAuth || isLoggedIn && (
-
-                    <div>
-                        <Button>Login</Button>
-                        <Button variant={'outline'} className="text-primary">Sign Up</Button>
+                {!isLoggedIn && (
+                    <div className="hidden lg:flex gap-x-2">
+                        <Button className="min-w-[140px]" onClick={() => router.push('/auth/login')}>Login</Button>
+                        <Button variant={'outline'} className="text-primary min-w-[140px]" onClick={() => router.push('/auth/register')}>Sign Up</Button>
                     </div>
                 )}
             </nav>
@@ -214,11 +216,11 @@ export default function Navbar() {
                                     </motion.div>
                                 ))
                             }
-                            <motion.div 
-                            initial={{
-                                y: 45,
-                                opacity: 0
-                            }}
+                            <motion.div
+                                initial={{
+                                    y: 45,
+                                    opacity: 0
+                                }}
                                 transition={{
                                     duration: 0.35,
                                     delay: (0.09 * navItems.length) + 0.35,
