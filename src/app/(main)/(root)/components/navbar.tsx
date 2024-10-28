@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import {HeartIcon, ShoppingCart, User2Icon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import React from "react";
 import { AnimatePresence, motion } from "framer-motion"
 import CurrencyConverter from "./currency-converter";
@@ -31,6 +31,15 @@ export default function Navbar() {
     const pathname = usePathname();
     const [mobileNavOpen, setMobileNavOpen] = React.useState(false);
     const [searchValue, setSearchValue] = React.useState('');
+    const searchParams = useSearchParams();
+    React.useEffect(() => {
+        const search = searchParams.get('search');
+        if (search) {
+            setSearchValue(search)
+        }
+    },[
+        searchParams.get('search')
+    ]);
     const handleChange = (value: string) => {
         setSearchValue(value);
         if (pathname === '/') {
