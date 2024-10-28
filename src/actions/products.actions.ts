@@ -6,6 +6,7 @@ import { notFound, redirect } from "next/navigation";
 import { sizeObj } from "@/constants/sizes";
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { tryCatchFn } from "@/utils/tryCatchFn";
 type WithoutSizes = Omit<ProductSchema, "sizes">;
 type ModifiedData = WithoutSizes & {
   size: ProductSchema["sizes"][number]["value"][];
@@ -238,6 +239,40 @@ export async function getAdminProducts() {
       message: "failed to get products",
     };
   }
+}
+export async function getMainSiteProducts() {
+  return await tryCatchFn({
+    cb: async ()=> {
+      const data = await prisma?.product.findMany({
+      where: {
+        isArchived: false,
+      },
+      select: {
+        id: true,
+        name: true,
+        price: true,
+        discountRate: true,
+        category: {
+          select: {
+            name: true,
+          },
+        },
+        size: true,
+        images: true,
+        units: true,
+        isFeatured: true,
+        createdAt: true,
+      },
+    });
+    return data?.map((item) => ({
+        ...item,
+        category: item.category.name,
+        image: item.images[0],
+        images: undefined,
+      }));
+  },
+  message: "failed to get products"
+  });
 }
 export async function deleteProduct(
   prevState: any,
