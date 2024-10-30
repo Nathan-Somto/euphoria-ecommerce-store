@@ -10,6 +10,7 @@ import { AnimatePresence, motion } from "framer-motion"
 import CurrencyConverter from "./currency-converter";
 import CategoryDropdown from "./category-dropdown";
 import NotificationBadge from "@/components/notification-badge";
+import { Session } from "next-auth";
 const mobileNavItems = (profileId: string | null) => [
     {
         title: 'Shop',
@@ -26,7 +27,10 @@ const mobileNavItems = (profileId: string | null) => [
         redirect: profileId === null
     },
 ]
-export default function Navbar() {
+type NavbarProps = {
+    session: Session | null
+}
+export default function Navbar({ session }: NavbarProps) {
     const router = useRouter();
     const pathname = usePathname();
     const [mobileNavOpen, setMobileNavOpen] = React.useState(false);
@@ -62,8 +66,8 @@ export default function Navbar() {
         document.querySelector('body')?.classList.toggle('overflow-hidden')
         setMobileNavOpen(val)
     }
-    const isLoggedIn = false;
-    const navItems = mobileNavItems(null)
+    const isLoggedIn = session?.user !== undefined;
+    const navItems = mobileNavItems(session?.user?.id ?? null);
     return (
         <>
             <nav className="flex items-center border-b-[1.5px] border-b-disabled h-20 z-[900000] py-6 w-full px-3 sm:px-7 justify-between fixed top-0 bg-white lg:w-full  inset-x-0">
@@ -93,7 +97,7 @@ export default function Navbar() {
                             <Button
                                 variant={'neutral'}
                                 size='icon'
-                                className="hidden lg:flex data-[active=true]:text-primary"
+                                className="hidden lg:flex data-[active=true]:text-primary data-[active=true]:!border-primary data-[active=true]:!border-solid data-[active=true]:!border-2"
                                 data-active={'/favourites' === pathname}
                                 onClick={() => router.push(isLoggedIn ? '/dashboard/wishlist' : '/auth/login')}
                             >
@@ -104,18 +108,23 @@ export default function Navbar() {
                             <Button
                                 variant={'neutral'}
                                 size='icon'
-                                className="hidden lg:flex data-[active=true]:text-primary"
+                                className="hidden lg:flex data-[active=true]:text-primary data-[active=true]:!border-primary data-[active=true]:!border-solid data-[active=true]:!border-2"
                                 data-active={'/dashboard' === pathname}
                                 onClick={() => router.push(isLoggedIn ? '/dashboard' : '/auth/login')}
                             >
-                                <User2Icon aria-labelledby="account">
-                                    <title id="account">account</title>
-                                </User2Icon>
+                                {/* Not using next image because of oauth providers */}
+                                {session?.user?.profilePhoto ? (
+                                    <img src={session?.user?.profilePhoto} alt="user avatar" className="rounded-full w-8 h-8" />
+                                ) : (
+                                    <User2Icon aria-labelledby="account">
+                                        <title id="account">account</title>
+                                    </User2Icon>
+                                )}
                             </Button>
                             <Button
                                 variant={'neutral'}
                                 size='icon'
-                                className="relative data-[active=true]:text-primary"
+                                className="relative data-[active=true]:text-primary data-[active=true]:!border-primary data-[active=true]:!border-solid data-[active=true]:!border-2"
                                 data-active={'/cart' === pathname}
                                 onClick={() => router.push(isLoggedIn ? '/cart' : '/auth/login')}
                             >
