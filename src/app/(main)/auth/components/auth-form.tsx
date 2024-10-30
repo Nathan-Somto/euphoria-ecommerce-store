@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import Link from 'next/link'
 import React from 'react'
 import { DefaultValues, useForm, UseFormReturn } from 'react-hook-form'
+import toast from 'react-hot-toast'
 import { z, ZodRawShape } from 'zod'
 type Props<T extends ZodRawShape | {}, U extends Record<string, any>> = {
     heading: string
@@ -41,12 +42,16 @@ export default function AuthForm<T extends ZodRawShape, U extends Record<string,
         mode: 'onBlur'
     })
     async function onSubmit(values: z.infer<typeof schema>) {
-        console.log(values)
         try {
-           await actionFn(values);
+            const res = await actionFn(values);
+            if (res?.error) {
+                throw new Error(res.message)
+            }
         }
         catch (err) {
-
+            if (err instanceof Error) {
+                toast.error(err?.message || 'An error occurred')
+            }
         }
 
     }
