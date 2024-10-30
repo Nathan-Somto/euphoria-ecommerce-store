@@ -6,10 +6,15 @@ import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/comp
 import { Input } from '@/components/ui/input';
 import Link from 'next/link';
 import OauthOptions from '../components/oauth-options';
+import { loginUser } from '@/actions/auth.actions';
+import { useSearchParams } from 'next/navigation';
 
 export default function LoginPage() {
+    const searchParams = useSearchParams();
+    const blockedRoute = searchParams.get('blockedRoute');
+    console.log('blockedRoute: ', blockedRoute)
+    const DEFAULT_LOGIN_REDIRECT = '/'
     return (
-
         <AuthForm
             schema={loginSchema}
             heading='Sign In'
@@ -19,14 +24,21 @@ export default function LoginPage() {
             belowBtnText="Don't have an account?"
             belowBtnLink="/auth/register"
             belowBtnLinkText="Sign Up"
-            renderChildren={(form) =>
+            actionFn={async (values) => await loginUser(
+                {
+                    email: values.email,
+                    password: values.password
+                },
+                blockedRoute || DEFAULT_LOGIN_REDIRECT,
+                false
+            )}
+            renderChildren={(form, isLoading) =>
                 <div className=''>
-                    <OauthOptions disabled={form.formState.isSubmitting}/>
+                    <OauthOptions disabled={isLoading} />
                     <FormField
                         control={form.control}
                         name="email"
                         render={({ field, fieldState }) => {
-                            console.log('email: ', fieldState)
                             return <FormItem className='mb-3'>
                                 <FormLabel className="text-lg font-normal text-[#3C4242]">Email Address</FormLabel>
                                 <FormControl>

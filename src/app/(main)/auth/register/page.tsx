@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import OauthOptions from '../components/oauth-options';
 import { Checkbox } from '@/components/ui/checkbox';
 import Link from 'next/link';
+import { registerUser } from '@/actions/auth.actions';
 function RegisterPage() {
     return (
         <AuthForm
@@ -18,14 +19,32 @@ function RegisterPage() {
             belowBtnText="Already have an account?"
             belowBtnLink="/auth/login"
             belowBtnLinkText="Sign In"
-            renderChildren={(form) =>
+            actionFn={async (values) => await registerUser(values)}
+            renderChildren={(form, isLoading) =>
                 <div className=''>
-                    <OauthOptions disabled={form.formState.isSubmitting} />
+                    <OauthOptions disabled={isLoading} />
+                    <FormField
+                        control={form.control}
+                        name="name"
+                        render={({ field, fieldState }) => {
+                            return <FormItem className='mb-3'>
+                                <FormLabel className="text-lg font-normal text-[#3C4242]">Full Name</FormLabel>
+                                <FormControl>
+                                    <Input
+                                        mainSite
+                                        isInvalid={fieldState.invalid}
+                                        placeholder="John Doe"
+                                        {...field}
+                                    />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        }}
+                    />
                     <FormField
                         control={form.control}
                         name="email"
                         render={({ field, fieldState }) => {
-                            console.log('email: ', fieldState)
                             return <FormItem className='mb-3'>
                                 <FormLabel className="text-lg font-normal text-[#3C4242]">Email Address</FormLabel>
                                 <FormControl>
@@ -67,12 +86,12 @@ function RegisterPage() {
                                     />
                                 </FormControl>
                                 <FormLabel className='text-[#807D7E] text-lg'>
-                                Agree to our <Link href="#" className='underline'>Terms</Link> of use and <Link href='#' className='underline'>Privacy Policy</Link> 
+                                    Agree to our <Link href="#" className='underline'>Terms</Link> of use and <Link href='#' className='underline'>Privacy Policy</Link>
                                 </FormLabel>
                             </FormItem>
                         )}
                     />
-                     <FormField
+                    <FormField
                         control={form.control}
                         name="newsLetter"
                         render={({ field }) => (
@@ -85,7 +104,7 @@ function RegisterPage() {
                                     />
                                 </FormControl>
                                 <FormLabel className='text-[#807D7E] text-lg'>
-                                Subscribe to our monthly newsletter
+                                    Subscribe to our monthly newsletter
                                 </FormLabel>
                             </FormItem>
                         )}
