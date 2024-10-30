@@ -12,6 +12,7 @@ const loginSchema = z.object({
 });
 const signUpSchema = z.object({
     ...loginSchema.shape,
+    name: z.string({required_error: "Name is required."}),
     terms: z.boolean().refine(value => value === true, {
         message: "You must agree to the terms and conditions."
     }),
