@@ -1,7 +1,7 @@
 'use client';
 import React, { ReactNode, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import {FLAGS, FeatureFlag } from './flags';
+import { FLAGS, FeatureFlag } from './flags';
 
 interface FeatureFlagGuardProps {
   flag: FeatureFlag;
@@ -12,14 +12,16 @@ interface FeatureFlagGuardProps {
 const FeatureFlagGuard: React.FC<FeatureFlagGuardProps> = ({ flag, children, redirectUrl }) => {
   const router = useRouter();
   const isEnabled = FLAGS[flag];
-
+  const [checking, setChecking] = React.useState(true);
   useEffect(() => {
     if (!isEnabled && redirectUrl) {
-      router.push(redirectUrl);
+      router.replace(redirectUrl);
+      return;
     }
+    setChecking(false);
   }, [isEnabled, redirectUrl, router]);
 
-  if (!isEnabled) {
+  if (!isEnabled || checking) {
     return null;
   }
 
