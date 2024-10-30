@@ -15,10 +15,7 @@ export default auth((req) => {
     const { isPublicRoute } = isPublicRouteTest(url.pathname);
     const isAdminRoute = url.pathname.startsWith(adminRoute);
     const isAuthRoute = url.pathname.startsWith('/auth');
-    let callbackUrl = url.pathname;
-    if (url.search) {
-        callbackUrl += url.search
-    }
+    let callbackUrl = `${url.pathname}${url.search}`;
     const encodedCallbackUrl = encodeURIComponent(callbackUrl)
     const isRedirecting = url.searchParams.has("blockedRoute")
     if (!isRedirecting) {
