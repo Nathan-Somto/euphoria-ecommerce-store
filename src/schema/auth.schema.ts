@@ -2,7 +2,7 @@ import { z } from "zod";
 
 const loginSchema = z.object({
     email: z.string({
-      required_error: "Email is required.",  
+        required_error: "Email is required.",
     }).email({
         message: "Invalid email address."
     }),
@@ -12,18 +12,18 @@ const loginSchema = z.object({
 });
 const signUpSchema = z.object({
     ...loginSchema.shape,
-    name: z.string({required_error: "Name is required."}),
+    name: z.string({ required_error: "Name is required." }),
     terms: z.boolean().refine(value => value === true, {
         message: "You must agree to the terms and conditions."
     }),
-    newsLetter: z.boolean()
+    newsLetter: z.boolean().optional()
 })
 const resetPasswordSchema = z.object({
     email: z.string({
-        required_error: "Email is required.",  
-      }).email({
-          message: "Invalid email address."
-      }),
+        required_error: "Email is required.",
+    }).email({
+        message: "Invalid email address."
+    }),
 })
 const newPasswordSchema = z.object({
     password: z.string({
@@ -32,10 +32,10 @@ const newPasswordSchema = z.object({
     confirmPassword: z.string({
         required_error: "Confirmed Password is required."
     }).min(8, "Confirmed Password must be at least 8 characters.")
-}) .refine((data) => data.password === data.confirmPassword, {
+}).refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
     path: ["confirmPassword"],
-  });
+});
 const verifyEmailSchema = z.object({
     token: z.string().max(6)
 })
