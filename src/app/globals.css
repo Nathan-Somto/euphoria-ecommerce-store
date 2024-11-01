@@ -86,4 +86,16 @@
       -ms-overflow-style: none;  /* IE and Edge */
       scrollbar-width: none;  /* Firefox */
 }
+
+.range-thumb::-webkit-slider-thumb {
+  height: 15px;
+  width: 15px;
+  border-radius: 50%;
+  background: hsl(var(--primary));
+  pointer-events: auto;
+  -webkit-appearance: none;
+  appearance: none;
+  cursor: pointer;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.6);
+}
 }
