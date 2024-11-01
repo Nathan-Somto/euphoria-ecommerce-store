@@ -262,6 +262,7 @@ export async function getMainSiteProducts() {
         units: true,
         isFeatured: true,
         createdAt: true,
+        colors: true
       },
     });
     return data?.map((item) => ({
