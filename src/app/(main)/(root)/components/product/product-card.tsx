@@ -50,7 +50,7 @@ export default function ProductCard({
     };
 
     return (
-        <>
+        <Link href={`/products/${id}`} >
             <div className="relative w-[220px]">
                 <div className="absolute top-2 flex justify-between w-full px-2">
                     <div>
@@ -102,6 +102,6 @@ export default function ProductCard({
                     </Link>
                 </div>
             </CustomDialog>
-        </>
+        </Link>
     );
 }
