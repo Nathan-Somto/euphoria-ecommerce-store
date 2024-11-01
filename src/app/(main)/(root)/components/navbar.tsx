@@ -10,6 +10,7 @@ import { AnimatePresence, motion } from "framer-motion"
 import CurrencyConverter from "./currency-converter";
 import CategoryDropdown from "./category-dropdown";
 import NotificationBadge from "@/components/notification-badge";
+import { CategoryWithProducts } from "@/actions/categories.actions";
 import { Session } from "next-auth";
 const mobileNavItems = (profileId: string | null) => [
     {
@@ -29,8 +30,9 @@ const mobileNavItems = (profileId: string | null) => [
 ]
 type NavbarProps = {
     session: Session | null
+    categories: CategoryWithProducts[]
 }
-export default function Navbar({ session }: NavbarProps) {
+export default function Navbar({ session, categories }: NavbarProps) {
     const router = useRouter();
     const pathname = usePathname();
     const [mobileNavOpen, setMobileNavOpen] = React.useState(false);
@@ -78,7 +80,7 @@ export default function Navbar({ session }: NavbarProps) {
                     <div className="hidden items-center gap-x-4 lg:flex">
                         <Link href="/">Shop</Link>
                         <CurrencyConverter />
-                        <CategoryDropdown />
+                        <CategoryDropdown categories={categories} />
                     </div>
                     <div className="lg:flex-[0.8] flex-[0.9]">
                         <SearchBar
@@ -272,7 +274,7 @@ export default function Navbar({ session }: NavbarProps) {
                                     }
                                 }}
                             >
-                                <CategoryDropdown />
+                                <CategoryDropdown categories={categories} />
                             </motion.div>
                         </motion.div>
                     )

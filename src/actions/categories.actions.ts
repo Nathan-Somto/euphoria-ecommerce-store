@@ -3,20 +3,21 @@ import prisma from "@/lib/prisma";
 import { categorySchema } from "@/schema/categories.schema";
 import { errorLogger } from "@/utils/errorLogger";
 import { revalidatePath } from "next/cache";
+import { cache } from "react";
 interface Category {
   id: string;
   name: string;
   createdAt: Date;
 }
 
-interface CategoryWithProducts extends Category {
+export interface CategoryWithProducts extends Category {
   products: { id: string }[];
 }
 export async function getCategories(addProducts: true): Promise<{ data: CategoryWithProducts[] }>;
 export async function getCategories(addProducts: false): Promise<{ data: Category[] }>;
 export async function getCategories(
   addProducts: boolean
-):Promise<{ data: Category[] | CategoryWithProducts[] }> {
+): Promise<{ data: Category[] | CategoryWithProducts[] }> {
   try {
     // add an  array of product ids to each category
     if (addProducts) {
@@ -44,7 +45,7 @@ export async function getCategories(
       },
     });
     return {
-      data: categories ,
+      data: categories,
     };
   } catch (err) {
     errorLogger(err);
@@ -53,6 +54,7 @@ export async function getCategories(
     };
   }
 }
+export const cachedGetCategories = cache(async () => getCategories(true));
 export async function createCategory(
   prevState: any,
   formData: FormData,

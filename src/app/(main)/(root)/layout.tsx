@@ -1,11 +1,11 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
 import '@/app/globals.css'
 import Navbar from './components/navbar'
 import Footer from './components/footer'
+import { causten } from "@/constants/fonts"
 import { currentSession } from '@/lib/next-auth'
+import { cachedGetCategories } from '@/actions/categories.actions'
 
-const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: 'Euphoria Store',
@@ -17,11 +17,12 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode
 }) {
+  const { data: categories } = await cachedGetCategories();
   const session = await currentSession();
   return (
     <html lang="en">
-      <body className={inter.className}>
-        <Navbar session={session} />
+      <body className={causten.className}>
+        <Navbar session={session} categories={categories} />
         <main className='mt-20'>
           {children}
         </main>
