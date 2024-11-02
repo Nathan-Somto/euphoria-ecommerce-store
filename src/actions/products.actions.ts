@@ -97,6 +97,7 @@ export async function getSimilarProducts(productId: string) {
         description: true,
         discountRate: true,
         colors: true,
+        categoryId: true,
         category: {
           select: {
             name: true,
@@ -112,8 +113,13 @@ export async function getSimilarProducts(productId: string) {
       take: 5,
     });
     return {
-      data: similarProducts,
-    };
+      data: similarProducts?.map((item) => ({
+        ...item,
+        category: item.category.name,
+        image: item.images[0],
+        images: undefined,
+      }))
+    }
   } catch (err) {
     errorLogger(err);
     return {
@@ -242,37 +248,37 @@ export async function getAdminProducts() {
 }
 export async function getMainSiteProducts() {
   return await tryCatchFn({
-    cb: async ()=> {
+    cb: async () => {
       const data = await prisma?.product.findMany({
-      where: {
-        isArchived: false,
-      },
-      select: {
-        id: true,
-        name: true,
-        price: true,
-        discountRate: true,
-        category: {
-          select: {
-            name: true,
-          },
+        where: {
+          isArchived: false,
         },
-        size: true,
-        images: true,
-        units: true,
-        isFeatured: true,
-        createdAt: true,
-        colors: true
-      },
-    });
-    return data?.map((item) => ({
+        select: {
+          id: true,
+          name: true,
+          price: true,
+          discountRate: true,
+          category: {
+            select: {
+              name: true,
+            },
+          },
+          size: true,
+          images: true,
+          units: true,
+          isFeatured: true,
+          createdAt: true,
+          colors: true
+        },
+      });
+      return data?.map((item) => ({
         ...item,
         category: item.category.name,
         image: item.images[0],
         images: undefined,
       }));
-  },
-  message: "failed to get products"
+    },
+    message: "failed to get products"
   });
 }
 export async function deleteProduct(
