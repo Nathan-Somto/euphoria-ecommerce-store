@@ -2,8 +2,8 @@
 import prisma from "@/lib/prisma";
 import { categorySchema } from "@/schema/categories.schema";
 import { errorLogger } from "@/utils/errorLogger";
-import { revalidatePath } from "next/cache";
-import { cache } from "react";
+import { revalidatePath, unstable_cache as cache } from "next/cache";
+
 interface Category {
   id: string;
   name: string;
@@ -54,7 +54,7 @@ export async function getCategories(
     };
   }
 }
-export const cachedGetCategories = cache(async () => getCategories(true));
+export const cachedGetCategories = cache(async () => getCategories(true), ['categories']);
 export async function createCategory(
   prevState: any,
   formData: FormData,

@@ -1,15 +1,14 @@
 import Banner from "./components/home/banner";
 import CategoryRow from './components/category-row';
-import { ProductRowSkeleton } from "./components/product/product-row-skeleton";
 import WhyUs from "./components/home/whyUs";
 import Brands from "./components/home/brands";
 import Testimonials from "./components/home/testimonials";
 import SearchResultsScreen from "./components/home/search-results";
 import { ProductRow } from "./components/product/product-row";
-import { getMainSiteProducts } from "@/actions/products.actions";
+import { getCachedProducts } from "@/actions/products.actions";
 export default async function Home() {
   //TODO: fetch products from server
-  const {data: products} = await getMainSiteProducts();
+  const {data: products} = await getCachedProducts();
   //TODO: fetch banner data from server
   //TODO: fetch categories from server
   //TODO: fetch testimonials from server

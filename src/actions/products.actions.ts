@@ -5,8 +5,10 @@ import { prettifyZodErrors } from "@/utils/prettifyZodErrors";
 import { notFound, redirect } from "next/navigation";
 import { sizeObj } from "@/constants/sizes";
 import prisma from "@/lib/prisma";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, unstable_cache as cache } from "next/cache";
 import { tryCatchFn } from "@/utils/tryCatchFn";
+
+
 type WithoutSizes = Omit<ProductSchema, "sizes">;
 type ModifiedData = WithoutSizes & {
   size: ProductSchema["sizes"][number]["value"][];
@@ -281,6 +283,11 @@ export async function getMainSiteProducts() {
     message: "failed to get products"
   });
 }
+// the revalidation is done by the admin panel
+export const getCachedProducts = cache(async () => await getMainSiteProducts(), ['products'], {
+  revalidate: false,
+  tags: ['products']
+});
 export async function deleteProduct(
   prevState: any,
   formData: FormData,

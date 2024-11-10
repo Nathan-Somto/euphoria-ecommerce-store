@@ -5,7 +5,7 @@ import Footer from './components/footer'
 import { causten } from "@/constants/fonts"
 import { currentSession } from '@/lib/next-auth'
 import { cachedGetCategories } from '@/actions/categories.actions'
-
+import { Toaster } from "react-hot-toast"
 
 export const metadata: Metadata = {
   title: 'Euphoria Store',
@@ -27,6 +27,7 @@ export default async function RootLayout({
           {children}
         </main>
         <Footer />
+        <Toaster position='bottom-right'/>
       </body>
     </html>
   )

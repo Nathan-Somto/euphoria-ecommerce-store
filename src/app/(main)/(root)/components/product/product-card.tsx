@@ -1,11 +1,13 @@
 'use client'
 import CustomDialog from "@/components/custom-dialog";
+import { Button } from "@/components/ui/button";
 import { convertToCurrency } from "@/utils/convertToCurrency";
 import { daysDifference } from "@/utils/daysDifference";
 import { HeartIcon, AlertTriangleIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
+import toast from "react-hot-toast";
 
 type ProductCardProps = {
     id: string,
@@ -41,14 +43,14 @@ export default function ProductCard({
         setIsInWishList(wishListProductIds.includes(id));
     }, [wishListProductIds]);
 
-    const handleAddToCart = () => {
-        if (!isLoggedIn) {
-            setOpenMustLogin(true);
-        } else {
-            setIsAddedToCart(true);
-        }
+    const handleAddToCart = (e:  React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        e.preventDefault();
+        setIsAddedToCart(true);
+        toast.success(`added ${name.slice(0,40)+"..."} to cart!`)
     };
-
+    const handleAddToWishList = async (e:  React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        e.preventDefault();
+    }
     return (
         <Link href={`/products/${id}`} >
             <div className="relative w-[220px]">
@@ -65,9 +67,9 @@ export default function ProductCard({
                             </div>
                         )}
                     </div>
-                    <div className="bg-white rounded-full p-2">
+                    <Button variant={'ghost'} onClick={handleAddToWishList} className="bg-white rounded-full p-2 size-8">
                         <HeartIcon className={`size-4 ${isInWishList ? "text-red-500" : "text-gray-500"}`} />
-                    </div>
+                    </Button>
                 </div>
                 <Image src={image} alt={`${name} image`} height={390} width={220} className="object-cover h-[270px] md:h-[350px] w-full" />
                 <div className="flex justify-between items-center mt-2">
