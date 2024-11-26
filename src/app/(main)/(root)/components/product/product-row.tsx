@@ -46,8 +46,10 @@ export function ProductRow({ data, headingFilter }: ProductRowProps) {
                                     wishListProductIds: [],
                                     discountRate: product.discountRate,
                                     createdAt: product.createdAt,
-                                    category: product.category
-
+                                    category: product.category,
+                                    colors: product.colors,
+                                    sizes: product.size,
+                                    unitsInStock: product.units
                                 }))}
                                 gapX={25}
                             />

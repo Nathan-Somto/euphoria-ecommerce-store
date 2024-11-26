@@ -31,7 +31,10 @@ function ProductList({ products, emptyText, emptyTextRender }: ProductGridProps)
               price={product.price}
               createdAt={product.createdAt}
               discountRate={product.discountRate}
+              colors={product.colors}
+              sizes={product.size}
               wishListProductIds={[]}
+              unitsInStock={product.units}
             />
           </motion.div>
         ))
