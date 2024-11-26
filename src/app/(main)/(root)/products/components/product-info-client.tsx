@@ -6,11 +6,15 @@ import { useMediaQuery } from '@/hooks/use-media-query'
 import { cn } from '@/lib/utils'
 import { pluralize } from '@/utils/pluralize'
 import { renderStars } from '@/utils/renderStars'
-import { LucideCreditCard, LucideShirt, LucideShoppingCart, LucideTruck, MessageSquareMoreIcon, PlayCircleIcon, PlayIcon } from 'lucide-react'
+import { BoxIcon, LucideCreditCard, LucideShirt, LucideShoppingCart, LucideTruck, MessageSquareMoreIcon, PlayCircleIcon, PlayIcon } from 'lucide-react'
 import React from 'react'
 import ProductInfoTabs from './product-info-tabs'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
+import { useisInCart } from '@/hooks/use-in-cart'
+import useCart from '@/hooks/use-cart'
+import { $Enums } from '@prisma/client'
+import toast from 'react-hot-toast'
 type Props = {
     data: ServerActionReturnType<typeof getProduct>
 }
@@ -35,8 +39,57 @@ const Perks = [
 function ProductInfoClient({ data }: Props) {
     const [activeSize, setActiveSize] = React.useState<string | null>(data.size[0])
     const [activeColor, setActiveColor] = React.useState<string | null>(data.colors[0])
+    const [quantity, setQuantity] = React.useState(1)
     const { isDesktop } = useMediaQuery({})
-    const [addedToCart, setAddedToCart] = React.useState(false)
+    const isInCart = useisInCart(data.id)
+    const addToCart = useCart(state => state.addToCart)
+    const cart = useCart(state => state.cart)
+    const increaseQuantity = useCart(state => state.increaseQuantity)
+    const decreaseQuantity = useCart(state => state.decreaseQuantity)
+    const calculateTotal = () => data.price * quantity
+    const onIncreaseQty = () => {
+        const qty = Math.min(quantity + 1, data.units);
+        if (isInCart) {
+            increaseQuantity(data.id);
+            return
+        }
+        setQuantity(qty)
+    }
+    const onDecreaseQty = () => {
+        const qty = Math.max(quantity - 1, 1);
+        if (isInCart) {
+            decreaseQuantity(data.id);
+            return
+        }
+        setQuantity(qty)
+    }
+    const findItem = () => cart.find(item => item.id === data.id)
+    const getQuantity = () => {
+        return isInCart ? findItem()?.quantity ?? 1 : quantity
+    }
+    const disableIncrease = () => {
+        console.log("result: ", findItem()?.quantity === data.units)
+        return isInCart ? findItem()?.quantity === data.units : quantity === data.units
+    }
+    const disableDecrease = () => {
+        return isInCart ? findItem()?.quantity === 1 : quantity === 1
+    }
+    const onAddToCart = () => {
+        if (isInCart) return
+        if (!activeSize || !activeColor) return
+        addToCart({
+            id: data.id,
+            color: activeColor,
+            size: activeSize as $Enums.Size,
+            imageUrl: data.images[0],
+            name: data.name,
+            price: data.price,
+            quantity,
+            total: calculateTotal(),
+            unitsInStock: data.units
+        })
+        toast.success('Added to cart')
+    }
     const images = data.images.map((image, index) => ({ src: image, alt: `${data.name} image ${index + 1} ` }))
     return (
         <>
@@ -115,6 +168,16 @@ function ProductInfoClient({ data }: Props) {
                                 />
                                 <p className=''>120 {pluralize('comment', 2)}</p>
                             </div>
+                            {/* Units Left */}
+                            <div className="flex items-center gap-x-2 text-lg ">
+                                <BoxIcon size={22} />
+                                <p>
+                                    <span className="font-semibold text-gray-800">
+                                        {data.units - getQuantity()}{' '}
+                                    </span>
+                                    units left
+                                </p>
+                            </div>
                         </div>
                         <div>
                             <h3 className='text-lg mb-3.5 font-medium text-[#3F4646]'>Select a Size</h3>
@@ -149,18 +212,32 @@ function ProductInfoClient({ data }: Props) {
                             </div>
                         </div>
                         <div className='flex items-center gap-6 mb-6 mt-5 flex-wrap'>
-                            <Button className='min-w-[200px] flex-shrink-0 tracking-[0%] text-lg h-[46px]'>
+                            <Button
+                                onClick={onAddToCart}
+                                disabled={isInCart}
+                                className='min-w-[200px] flex-shrink-0 tracking-[0%] text-lg h-[46px]'
+                            >
                                 <LucideShoppingCart className='mr-2 size-4' />
-                                {addedToCart ? 'Added to Cart' : 'Add to Cart'}
+                                {isInCart ? 'Added to Cart' : 'Add to Cart'}
                             </Button>
                             <Button variant={'outline'} className='min-w-[138px] h-[46px]' >${
-                                data.price
+                                (data.price * getQuantity()).toFixed(2)
                             }</Button>
                         </div>
                         <div className='flex items-center gap-x-3'>
-                            <Button size={'icon'} className='text-lg size-7 p-1.5'>+</Button>
-                            <p className='text-lg font-medium text-primary-foreground '>1</p>
-                            <Button size={'icon'} className='text-lg size-7 p-1.5'>-</Button>
+                            <Button
+                                size={'icon'}
+                                className='text-lg size-7 p-1.5'
+                                disabled={disableIncrease()}
+                                onClick={onIncreaseQty}
+                            >+</Button>
+                            <p className='text-lg font-medium text-primary-foreground '>{getQuantity()}</p>
+                            <Button
+                                size={'icon'}
+                                className='text-lg size-7 p-1.5'
+                                disabled={disableDecrease()}
+                                onClick={onDecreaseQty}
+                            >-</Button>
                         </div>
                     </div>
                     <div className='grid grid-cols-2 mt-5'>
