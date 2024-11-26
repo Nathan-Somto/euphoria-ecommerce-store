@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useSearchParams } from 'next/navigation';
 import ProductCard from '../product/product-card';
 import { ProductResponse } from '../product';
+import ProductList from '../product/product-list';
 
 type SearchResultsScreenProps = {
     products: ProductResponse;
@@ -82,35 +83,9 @@ export default function SearchResultsScreen({ products }: SearchResultsScreenPro
                             Search Results for "{query}"({filteredProducts.length})
                         </h2>
                         <div className="grid place-items-center grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                            {filteredProducts.length > 0 ? (
-                                filteredProducts.map((product, index) => (
-                                    <motion.div
-                                        key={product.id}
-                                        initial={{ opacity: 0, scale: 0.5 }}
-                                        whileInView={{ opacity: 1, scale: 1 }}
-                                        viewport={{ amount: 'some', once: true }}
-                                        transition={{
-                                            duration: 0.65,
-                                            delay: 0.75 + (index * 0.09)
-                                        }}
-                                    >
-                                        <ProductCard
-                                            category={product.category}
-                                            id={product.id}
-                                            image={product.image}
-                                            name={product.name}
-                                            price={product.price}
-                                            createdAt={product.createdAt}
-                                            discountRate={product.discountRate}
-                                            wishListProductIds={[]}
-                                        />
-                                    </motion.div>
-                                ))
-                            ) : (
-                                <p className="text-center text-gray-500">
-                                    No results found for <span className="font-semibold">"{query}"</span>
-                                </p>
-                            )}
+                            <ProductList
+                                products={filteredProducts}
+                                emptyTextRender={() => <>No results found for <span className="font-semibold">"{query}"</span> </>} />
                         </div>
                     </div>
                 </motion.div>

@@ -2,6 +2,7 @@
 import React from 'react'
 import SectionHeading from '../section-heading'
 import RowSlider from '@/components/carousel/row-slider'
+import { Rating, renderStars } from '@/utils/renderStars'
 type TestimonialCardProps = {
     id: string,
     rating: number, // 1 - 5 (half stars allowed)
@@ -10,31 +11,14 @@ type TestimonialCardProps = {
     image: string
 }
 function TestimonialCard({ rating, name, message, image }: TestimonialCardProps) {
-    const renderStars = () => {
-        const stars = [];
-
-        const [wholenumber, decimal] = rating.toString().split('.');
-        for (let i = 0; i < parseInt(wholenumber); i++) {
-            stars.push('/testimonials/full-star.svg')
-        }
-        if (decimal) {
-            stars.push('/testimonials/half-star.svg')
-        }
-        for (let i = stars.length; i < 5; i++) {
-            stars.push('/testimonials/empty-star.svg')
-        }
-        return stars.map((star, index) => (
-            <img key={index} src={star} alt="star" />
-        ))
-    }
     return (
         <div className=' border-2 border-[#BEBCBD] rounded-lg  p-6 min-h-[292px] w-96'>
             <div >
                 <div className='flex justify-between mb-2'>
                     <img src={image} alt={name + "photo"} className='object-contain size-14' />
-                <div className='flex items-center gap-1.5'>{renderStars()}</div>
+                    <div className='flex items-center gap-1.5'>{renderStars(rating as Rating)}</div>
                 </div>
-                    <p className='text-primary-foreground text-2xl my-5 '>{name}</p>
+                <p className='text-primary-foreground text-2xl my-5 '>{name}</p>
             </div>
             <p className='text-[#807D7E] text-sm mt-3'>{message}</p>
         </div>

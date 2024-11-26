@@ -13,6 +13,7 @@ import { ProductCardSkeleton } from '../../components/product/product-row-skelet
 import { Loader2Icon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
+import ProductList from '../../components/product/product-list';
 type ProductGridProps = {
     products: ProductResponse
 }
@@ -76,39 +77,21 @@ function ProductsGrid({ products }: ProductGridProps) {
             </header>
             <div>
                 <div className={cn("gap-x-4 gap-y-6 min-[580px]:grid-cols-2 md:grid-cols-3 grid place-items-center", isLoading && 'flex justify-center items-center')}>
-                    {isLoading ? <div>
-                        <div className="animate-spin gap-x-0.5">
-                            <Loader2Icon className='size-10 text-primary' />
-                        </div>
-                    </div> : filteredResults.length > 0 ? (
-                        filteredResults.map((product, index) => (
-                            <motion.div
-                                key={product.id}
-                                initial={{ opacity: 0, scale: 0.5 }}
-                                whileInView={{ opacity: 1, scale: 1 }}
-                                viewport={{ amount: 'some', once: true }}
-                                transition={{
-                                    duration: 0.65,
-                                    delay: 0.75 + (index * 0.09)
-                                }}
-                            >
-                                <ProductCard
-                                    category={product.category}
-                                    id={product.id}
-                                    image={product.image}
-                                    name={product.name}
-                                    price={product.price}
-                                    createdAt={product.createdAt}
-                                    discountRate={product.discountRate}
-                                    wishListProductIds={[]}
-                                />
-                            </motion.div>
-                        ))
-                    ) : (
-                        <p className="text-center text-gray-500  w-full col-span-4">
-                            No  Products {filters.length > 0 ? `using the following filters: ` : ''} <span className="font-semibold text-primary">{filters}</span>
-                        </p>
-                    )}
+                    {isLoading ?
+                        <div>
+                            <div className="animate-spin gap-x-0.5">
+                                <Loader2Icon className='size-10 text-primary' />
+                            </div>
+                        </div> :
+                        <ProductList
+                            products={filteredResults}
+                            emptyTextRender={() =>
+                                <>
+                                    No  Products {filters.length > 0 ? `using the following filters: ` : ''}
+                                    <span className="font-semibold text-primary">{filters}</span>
+                                </>}
+                        />
+                    }
                 </div>
 
             </div>

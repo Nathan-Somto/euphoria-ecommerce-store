@@ -1,5 +1,5 @@
 {
-  "name": "fashion-hub",
+  "name": "euphoria-ecommerce-store",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -51,7 +51,7 @@
     "tailwindcss-animate": "^1.0.7",
     "uuid": "^9.0.1",
     "zod": "^3.22.4",
-    "zustand": "^4.5.0"
+    "zustand": "^4.5.5"
   },
   "devDependencies": {
     "@react-email/components": "^0.0.25",

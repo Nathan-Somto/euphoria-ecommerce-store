@@ -1,11 +1,16 @@
 'use client'
 import CustomDialog from "@/components/custom-dialog";
+import { Button } from "@/components/ui/button";
+import useCart from "@/hooks/use-cart";
+import { $Enums } from '@prisma/client';
+import { useisInCart } from "@/hooks/use-in-cart";
 import { convertToCurrency } from "@/utils/convertToCurrency";
 import { daysDifference } from "@/utils/daysDifference";
 import { HeartIcon, AlertTriangleIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
+import toast from "react-hot-toast";
 
 type ProductCardProps = {
     id: string,
@@ -15,7 +20,10 @@ type ProductCardProps = {
     wishListProductIds: string[],
     discountRate: number | null,
     createdAt: Date,
-    category: string
+    category: string,
+    colors: string[],
+    sizes: $Enums.Size[],
+    unitsInStock: number
 }
 
 export default function ProductCard({
@@ -26,31 +34,44 @@ export default function ProductCard({
     wishListProductIds,
     discountRate,
     createdAt,
-    category
+    category,
+    colors,
+    sizes,
+    unitsInStock
 }: ProductCardProps) {
     //TODO: implement zustand store for cart, currency conversion, wishlist
+    const { addToCart, removeFromCart } = useCart();
     const [isInWishList, setIsInWishList] = React.useState(false);
     const [openMustLogin, setOpenMustLogin] = React.useState(false);
-    const [isAddedToCart, setIsAddedToCart] = React.useState(false);
-
+    const isInCart = useisInCart(id);
     const isLoggedIn = false;
     const rate = 486;
     const currency: '₦' | '$' = '$';
-
     React.useEffect(() => {
         setIsInWishList(wishListProductIds.includes(id));
     }, [wishListProductIds]);
 
-    const handleAddToCart = () => {
-        if (!isLoggedIn) {
-            setOpenMustLogin(true);
-        } else {
-            setIsAddedToCart(true);
-        }
+    const handleAddToCart = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        e.preventDefault();
+        const color = colors[0];
+        addToCart({
+            color,
+            id,
+            imageUrl: image,
+            name,
+            price,
+            quantity: 1,
+            size: sizes[0],
+            total: price * 1,
+            unitsInStock
+        });
+        toast.success(`added ${name.slice(0, 40) + "..."} to cart!`)
     };
-
+    const handleAddToWishList = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        e.preventDefault();
+    }
     return (
-        <>
+        <Link href={`/products/${id}`} >
             <div className="relative w-[220px]">
                 <div className="absolute top-2 flex justify-between w-full px-2">
                     <div>
@@ -65,9 +86,9 @@ export default function ProductCard({
                             </div>
                         )}
                     </div>
-                    <div className="bg-white rounded-full p-2">
+                    <Button variant={'ghost'} onClick={handleAddToWishList} className="bg-white rounded-full p-2 size-8">
                         <HeartIcon className={`size-4 ${isInWishList ? "text-red-500" : "text-gray-500"}`} />
-                    </div>
+                    </Button>
                 </div>
                 <Image src={image} alt={`${name} image`} height={390} width={220} className="object-cover h-[270px] md:h-[350px] w-full" />
                 <div className="flex justify-between items-center mt-2">
@@ -81,11 +102,11 @@ export default function ProductCard({
                 {/* Add to Cart Button */}
                 <div className="mt-3">
                     <button
-                        className="text-primary-foreground/80 underline"
+                        className="text-primary-foreground/80 underline disabled:opacity-50 disabled:no-underline disabled:cursor-not-allowed"
                         onClick={handleAddToCart}
-                        disabled={isAddedToCart}
+                        disabled={isInCart}
                     >
-                        {isAddedToCart ? "Added to Cart" : "Add to Cart"}
+                        {isInCart ? "Added to Cart" : "Add to Cart"}
                     </button>
                 </div>
             </div>
@@ -102,6 +123,6 @@ export default function ProductCard({
                     </Link>
                 </div>
             </CustomDialog>
-        </>
+        </Link>
     );
 }

@@ -44,7 +44,7 @@ export default function AuthLayout({
     <html lang="en">
       <body className={causten.className}>
         {/* Should always be null in this page */}
-        <Navbar session={null} />
+        <Navbar session={null} categories={[]} />
         <main className="flex flex-col h-fit lg:min-h-[calc(100vh-(20*0.25rem))] lg:flex-row mt-[calc(20*0.25rem)]">
           <AuthAsideImage images={authImages} />
           {children}
