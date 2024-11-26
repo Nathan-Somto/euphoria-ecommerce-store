@@ -12,6 +12,7 @@ import CategoryDropdown from "./category-dropdown";
 import NotificationBadge from "@/components/notification-badge";
 import { CategoryWithProducts } from "@/actions/categories.actions";
 import { Session } from "next-auth";
+import useCart from "@/hooks/use-cart";
 const mobileNavItems = (profileId: string | null) => [
     {
         title: 'Shop',
@@ -37,6 +38,7 @@ export default function Navbar({ session, categories }: NavbarProps) {
     const pathname = usePathname();
     const [mobileNavOpen, setMobileNavOpen] = React.useState(false);
     const [searchValue, setSearchValue] = React.useState('');
+    const cart = useCart(state => state.cart);
     const searchParams = useSearchParams();
     React.useEffect(() => {
         const search = searchParams.get('search');
@@ -94,6 +96,18 @@ export default function Navbar({ session, categories }: NavbarProps) {
                     </div>
                 </div>
                 <div className="flex gap-x-2">
+                    <Button
+                        variant={'neutral'}
+                        size='icon'
+                        className="relative data-[active=true]:text-primary data-[active=true]:!border-primary data-[active=true]:!border-solid data-[active=true]:!border-2"
+                        data-active={'/cart' === pathname}
+                        onClick={() => router.push('/cart')}
+                    >
+                        <ShoppingCart aria-labelledby="cart">
+                            <title id="cart">cart</title>
+                        </ShoppingCart>
+                        {cart.length > 0 && (<NotificationBadge value={cart.length} size={20} />)}
+                    </Button>
                     {isLoggedIn && (
                         <>
                             <Button
@@ -122,18 +136,6 @@ export default function Navbar({ session, categories }: NavbarProps) {
                                         <title id="account">account</title>
                                     </User2Icon>
                                 )}
-                            </Button>
-                            <Button
-                                variant={'neutral'}
-                                size='icon'
-                                className="relative data-[active=true]:text-primary data-[active=true]:!border-primary data-[active=true]:!border-solid data-[active=true]:!border-2"
-                                data-active={'/cart' === pathname}
-                                onClick={() => router.push(isLoggedIn ? '/cart' : '/auth/login')}
-                            >
-                                <ShoppingCart aria-labelledby="cart">
-                                    <title id="cart">cart</title>
-                                </ShoppingCart>
-                                <NotificationBadge value={5} size={20} />
                             </Button>
                         </>
                     )}
