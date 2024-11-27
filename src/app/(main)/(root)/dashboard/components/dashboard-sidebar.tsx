@@ -44,7 +44,7 @@ export default function DashboardSidebar({ username }: Props) {
         },
         {
             label: 'My Account',
-            href: '/dashboard'
+            href: pathname.includes('address') ? pathname : '/dashboard'
         }
     ];
     if (lastDynamicLink && lastDynamicLink.label !== 'My Info') {
@@ -63,10 +63,15 @@ export default function DashboardSidebar({ username }: Props) {
         }
     }, [isMobile]);
     console.log("isMobile", isMobile);
+    const isRoute = (href: string) => {
+        if (href === '/dashboard' && pathname.includes('address')) return true
+        return href === pathname;
+    }
     return (
-        <>
+        <div
+            className={cn('top-20  lg:sticky  fixed block left-0 z-[50] h-0  border-r-neutral-300 border-r w-0', isOpen && 'h-[calc(100vh-20*0.25rem)] w-[250px] overflow-hidden')}>
             <div
-                className={cn('absolute top-20 left-0 right-0  z-[30] lg:hidden h-full w-10 border-r-neutral-300 border-r bg-background', isOpen && 'left-[250px] h-20 bg-transparent border-r-0 border-r-transparent')}
+                className={cn('absolute top-0 left-0 right-0  z-[30] lg:hidden h-full w-10  bg-background', isOpen && 'left-[200px] h-20 bg-transparent')}
             >
                 <Button
                     onClick={() => setIsOpen(!isOpen)}
@@ -84,10 +89,16 @@ export default function DashboardSidebar({ username }: Props) {
                     <motion.div
                         key="dashboard-sidebar-overlay"
                         initial={{ opacity: 0 }}
-                        animate={{ opacity: isOpen ? 1 : 0 }}
-                        transition={{ duration: 0.3 }}
+                        animate={{
+                            opacity: isOpen ? 1 : 0, transition: {
+                                duration: 0.3,
+                                delay: 0.5,
+                                ease: "easeIn"
+                            }
+                        }}
+                        transition={{ duration: 0.3, ease: 'easeIn' }}
                         exit={{ opacity: 0 }}
-                        className={cn('fixed inset-0 bg-black z-[10] bg-opacity-50 lg:!hidden', !isOpen && 'hidden')}
+                        className={cn('fixed top-20 left-[250px] h-[calc(100vh-20*0.25rem)] w-[calc(100%-250px)] bg-black z-[10] bg-opacity-50 lg:!hidden', !isOpen && 'hidden')}
                         onClick={() => setIsOpen(false)}
                     />
                 )}
@@ -98,8 +109,8 @@ export default function DashboardSidebar({ username }: Props) {
                             initial={!isMobile ? undefined : { x: -250 }}
                             animate={!isMobile ? undefined : { x: isOpen ? 0 : -250 }}
                             exit={{ x: -250 }}
-                            transition={{ duration: 0.3 }}
-                            className={cn('sticky top-20 pt-6 w-[250px] bg-background z-[30] min-h-screen pl-1.5', !isOpen && 'hidden')}>
+                            transition={{ duration: 0.65, ease: [0.21, 0.43, 0.012, 0.122] }}
+                            className={cn('w-[250px] pt-6 pl-1.5 z-[30] h-full bg-background', !isOpen && 'hidden')}>
                             <div className='lg:block hidden lg:mb-7'>
                                 <LinkHistory
                                     links={dynamicLinks}
@@ -115,7 +126,7 @@ export default function DashboardSidebar({ username }: Props) {
                             <ul className='space-y-3'>
                                 {items.map((item, index) => (
                                     <li key={index}>
-                                        <Button asChild variant={pathname === item.href ? 'lite' : 'ghost'} className='w-full flex justify-start gap-x-2'>
+                                        <Button asChild variant={isRoute(item.href) ? 'lite' : 'ghost'} className='w-full flex justify-start gap-x-2'>
                                             <Link href={item.href}>
                                                 <item.icon />
                                                 <span>{item.label}</span>
@@ -130,6 +141,6 @@ export default function DashboardSidebar({ username }: Props) {
                 }
             </AnimatePresence>
 
-        </>
+        </div>
     )
 }
