@@ -21,7 +21,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             if (account?.provider !== 'credentials') return true
             // check if the email is verified
             const res = await executeIfEnabled('EMAIL_VERIFICATION', async () => {
-                if(!user.id) return false
+                if (!user.id) return false
                 const existingUser = await getUserByEmail(user.id)
                 if (!existingUser.data?.isEmailVerified) return false
             })
@@ -29,9 +29,19 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             if (res !== undefined && !res) return false
             return true
         },
-        jwt: async ({ user, account, token }) => {
-            console.log("the token: ", JSON.stringify(user, null,2))
-            console.log("the user: ", JSON.stringify(user, null,2))
+        jwt: async ({ user, account, token, session, trigger }) => {
+            console.log("the user in jwt: ", JSON.stringify(user, null, 2))
+            if (trigger === 'update' && session) {
+                token.id = session.user.id
+                token.email = session.user.email
+                token.role = session.user.role
+                token.username = session.user.username
+                token.profilePhoto = session.user.profilePhoto
+                token.isOAuth = session.user.isOAuth
+                token.isEmailVerified = session.user.isEmailVerified
+                token.name = session.user.name
+                return token
+            }
             const existingUser = await getUserByEmail(token.email ?? user.email ?? '');
             if (!existingUser?.data) {
                 token.id = user.id
@@ -44,6 +54,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             token.profilePhoto = existingUser.data.profilePhoto
             token.isOAuth = account?.provider !== 'credentials'
             token.isEmailVerified = existingUser.data.isEmailVerified
+            token.name = existingUser.data.name
             return token
         },
         session: ({ session, token }) => {
@@ -54,6 +65,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 session.user.username = token.username as string
                 session.user.profilePhoto = token.profilePhoto as string
                 session.user.isOAuth = token.isOAuth as boolean
+                session.user.name = token.name as string
             }
             return session
         }
