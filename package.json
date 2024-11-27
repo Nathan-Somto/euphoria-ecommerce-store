@@ -44,6 +44,7 @@
     "react-email": "^3.0.1",
     "react-hook-form": "^7.50.1",
     "react-hot-toast": "^2.4.1",
+    "react-phone-number-input": "^3.4.9",
     "react-select": "^5.8.1",
     "recharts": "^2.12.1",
     "resend": "^4.0.1-alpha.0",
