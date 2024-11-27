@@ -24,6 +24,7 @@ type DeleteDialogProps = {
     title: string;
     message: string;
   }
+  isPending?: boolean;
 };
 function DeleteDialog({
   actionFn,
@@ -32,7 +33,8 @@ function DeleteDialog({
   open,
   resourceName,
   customAction,
-  customTemplate
+  customTemplate,
+  isPending
 }: DeleteDialogProps) {
   const [state, action] = useFormState(
     (prevState: any, formData: FormData) => actionFn && actionFn(prevState, formData, id),
@@ -67,7 +69,11 @@ function DeleteDialog({
           </>
         )}
         <form action={action}>
-          <DeleteModalButtons setOpen={setOpen} customAction={customAction} />
+          <DeleteModalButtons 
+          setOpen={setOpen} 
+          customAction={customAction} 
+          isPending={isPending}
+          />
         </form>
       </>
     </CustomDialog>
@@ -76,13 +82,14 @@ function DeleteDialog({
 function DeleteModalButtons({
   setOpen,
   customAction,
-}: Pick<DeleteDialogProps, "setOpen" | 'customAction'>
+  isPending
+}: Pick<DeleteDialogProps, "setOpen" | 'customAction' | 'isPending'>
 ) {
   const { pending } = useFormStatus();
   return (
     <div className="pt-6 space-x-2 flex items-center  w-full">
       <Button
-        disabled={pending}
+        disabled={pending || isPending}
         variant="outline"
         onClick={() => setOpen(false)}
         type="button"
@@ -92,7 +99,7 @@ function DeleteModalButtons({
       </Button>
       <Button
         className="w-[48%] flex-shrink-0"
-        disabled={pending}
+        disabled={pending || isPending}
         variant="destructive"
         onClick={customAction}
         type={customAction ? 'button' : 'submit'}>
