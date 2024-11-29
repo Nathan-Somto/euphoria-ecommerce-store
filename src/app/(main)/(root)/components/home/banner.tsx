@@ -49,13 +49,13 @@ function Banner() {
             buttonText: 'See Collection'
           }
         ]}
-        renderItem={(currentSlide, itemData) => {
+        renderItem={(currentSlide, itemData, showImmediately = false) => {
           const slide = itemData[currentSlide];
           return (
             <motion.div
               key={currentSlide + 'banner'}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1, transition: { duration: 0.23, delay: 1.2 } }}
+              initial={!showImmediately ? { opacity: 0 } : undefined}
+              animate={!showImmediately ? { opacity: 1, transition: { duration: 0.23, delay: 1.2 } } : undefined}
               exit={{ opacity: 0, transition: { duration: 0.23 } }}
               className="absolute inset-0 z-[2] flex items-center h-full w-full text-left  space-y-2">
               <div className="max-w-[700px]  text-left ml-[70px] lg:ml-[100px]">
@@ -84,7 +84,7 @@ function Banner() {
                     }
                   }}
                 >
-                  {slide.title.split(' ').map((word, index) => {
+                  {(slide.title as string).split(' ').map((word, index) => {
                     return <div key={word + index} className="flex flex-wrap overflow-hidden">
                       {
                         word.split('').map((char, index) => {
