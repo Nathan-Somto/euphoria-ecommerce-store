@@ -37,7 +37,7 @@ const getWishlistProducts = async () => {
                     AND: [
                         {
                             id: {
-                                in: Object.keys(wishlistProductIds)
+                                in: Object.keys(wishlistProductIds?.data ?? {})
                             }
                         },
                         {
@@ -46,6 +46,7 @@ const getWishlistProducts = async () => {
                     ]
                 },
                 select: {
+                    id: true,
                     images: true,
                     category: {
                         select: {
@@ -55,6 +56,8 @@ const getWishlistProducts = async () => {
                     colors: true,
                     name: true,
                     units: true,
+                    price: true,
+                    size: true
                 }
             });
             const normalizedData = wishlistProducts.map(product => ({
@@ -62,7 +65,6 @@ const getWishlistProducts = async () => {
                 image: product.images[0],
                 category: product.category.name,
                 images: undefined,
-                colors: product.colors[0]
             }))
             return normalizedData;
         },
