@@ -1,4 +1,3 @@
-'use client';
 import { pluralize } from '@/utils/pluralize';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -21,7 +20,7 @@ export default function CategoryRow({ data }: Props) {
                         <div className="h-full absolute z-[2] w-full bg-black/10 inset-0 flex flex-col justify-center px-6">
                             <h4 className="text-left text-3xl text-white max-w-[300px] leading-[45px] mb-1 font-semibold">{category.name}</h4>
                             <p className="text-white font-light opacity-70 mb-4 text-[16.5px]">({category.totalProducts}) {pluralize('Product', category.totalProducts)}</p>
-                            <Link href={`/products/${category.name}`} className="underline p-0 max-w-fit text-white">
+                            <Link href={`/products?category=${category.name.toLowerCase()}`} className="underline p-0 max-w-fit text-white">
                                 Explore Products
                             </Link>
                         </div>
