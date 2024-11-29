@@ -56,7 +56,7 @@ function DeleteDialog({
             <DialogHeader className="text-2xl font-semibold text-gray-700 mb-1.5">
               {customTemplate.title}
             </DialogHeader>
-            <DialogDescription className="text-gray-500">{customTemplate.message}</DialogDescription>
+            <DialogDescription className="text-gray-500 whitespace-break-spaces">{customTemplate.message}</DialogDescription>
           </div>
         ) : (
           <>
@@ -69,10 +69,10 @@ function DeleteDialog({
           </>
         )}
         <form action={action}>
-          <DeleteModalButtons 
-          setOpen={setOpen} 
-          customAction={customAction} 
-          isPending={isPending}
+          <DeleteModalButtons
+            setOpen={setOpen}
+            customAction={customAction}
+            isPending={isPending}
           />
         </form>
       </>
