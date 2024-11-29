@@ -9,15 +9,15 @@ import { ProductRowSkeleton } from "./product-row-skeleton";
 
 type ProductRowProps = {
     data: ProductResponse
-    headingFilter: string | 'New Arrivals'
+    headingFilter: string | 'Featured'
 }
 export function ProductRow({ data, headingFilter }: ProductRowProps) {
     const [products, setProducts] = React.useState<ProductResponse>(data)
     const [loading, setLoading] = React.useState(true)
     React.useEffect(() => {
         const timeoutId = setTimeout(() => {
-            if (headingFilter === 'New Arrivals') {
-                setProducts(data.filter(product => daysDifference(new Date(product.createdAt), new Date()) <= 30))
+            if (headingFilter === 'Featured') {
+                setProducts(data.filter(product => product.isFeatured))
             }
             else {
                 setProducts(data.filter(product => product.category === headingFilter))

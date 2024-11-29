@@ -11,7 +11,7 @@ type CarouselProps = {
         alt: string;
     }[];
     itemData?: any[];
-    renderItem?: (currentSlide: number, itemData: any[]) => React.ReactNode;
+    renderItem?: (currentSlide: number, itemData: any[], showImmediately?: boolean) => React.ReactNode;
     shouldAutoPlay: boolean;
     duration: number;
     showIndicators: boolean;
@@ -27,14 +27,17 @@ export default function Carousel({
     itemData = [],
     renderItem = (currentSlide: number, itemData: any[]) => <></>
 }: CarouselProps) {
+    const [prevSlide, setPrevSlide] = React.useState(imgData.length - 1);
     const [currentSlide, setCurrentSlide] = React.useState(0);
     const [direction, setDirection] = React.useState(-1);
     const totalSlides = imgData.length;
-
+    const [renderCount, setRenderCount] = React.useState(0);
 
     const paginate = (newDirection: number) => {
         setDirection(newDirection);
+        setPrevSlide(currentSlide);
         setCurrentSlide((prev) => (prev + newDirection + totalSlides) % totalSlides);
+        setRenderCount(prev => prev + 1);
     };
 
 
@@ -52,31 +55,56 @@ export default function Carousel({
             return () => clearInterval(timer);
         }
     }, [currentSlide, shouldAutoPlay, duration]);
-    const { imgSrc, alt } = imgData[currentSlide]
+    const currentImage = imgData[currentSlide];
+    const prevImage = imgData[prevSlide];
+    console.log("the prev: ", prevSlide);
+    console.log("the current: ", currentSlide)
     return (
-        <AnimatePresence mode="wait" initial={false} >
+        <AnimatePresence mode="wait" >
             <motion.div
                 className="relative overflow-hidden"
                 style={{
                     width: width,
                     height: height
                 }}
-                key={imgSrc}
+                key={'carousel'}
             >
                 <motion.div
-                    key={imgSrc}
-                    drag="x"
-                    onDragEnd={handleDragEnd}
-                    style={{ height, overflow: 'hidden' }}
-                    dragConstraints={{ left: 0, right: 0 }}
-                    initial={{ x: direction === 1 ? '100%' : '-100%', opacity: 0, zIndex: -3 }}
-                    animate={{ x: 0, opacity: 1 }}
-                    exit={{ x: direction === 1 ? '-100%' : '100%', opacity: 0, zIndex: -2 }}
-                    transition={{ duration: 0.75, ease: 'easeIn', }}
+                    className='w-full'
+                    style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        height,
+                        overflow: 'hidden',
+                        zIndex: -4,
+                    }}
                 >
                     <motion.img
-                        src={imgSrc}
-                        alt={alt}
+                        key={prevImage.imgSrc + prevSlide}
+                        initial={renderCount > 0 ? { x: 0, opacity: 1, scale: 1.05 } : { opacity: 0 }}
+                        animate={renderCount > 0 ? {
+                            opacity: 1, scale: 1
+                        } : undefined}
+                        transition={{ delay: 0.35, duration: 0.45, ease: [0.31, 0.11, 0.41, 0.51] }}
+                        src={prevImage.imgSrc}
+                        alt={prevImage.alt}
+                        className="object-center object-cover w-full h-full bg-fixed"
+                    />
+                </motion.div>
+                <motion.div
+                    key={currentImage.imgSrc + currentSlide}
+                    style={{ height, overflow: 'hidden' }}
+                    initial={renderCount > 0 ? { x: direction === 1 ? '-100%' : '100%', zIndex: -3 } : undefined}
+                    animate={renderCount > 0 ? { x: 0 } : undefined}
+                    exit={{ x: direction === 1 ? '100%' : '-100%', zIndex: -2 }}
+                    transition={renderCount > 0 ? { duration: 1.2, ease: 'easeIn', } : undefined}
+                    className='z-[-2] absolute inset-0  w-full'
+                >
+                    <motion.img
+                        src={currentImage.imgSrc}
+                        alt={currentImage.alt}
                         style={{
                             width: '100%',
                             height: '100%',
@@ -84,16 +112,18 @@ export default function Carousel({
                         initial={{ scale: 1 }}
                         animate={{ scale: 1.05 }}
                         exit={{ scale: 1 }}
-                        transition={{
+                        transition={renderCount > 0 ? {
                             delay: 0.5,
                             duration: 1,
                             ease: "easeIn",
+                        } : {
+                            delay: 0.15,
+                            duration: 0.75,
+                            ease: "easeIn"
                         }}
-                        className="object-center object-cover"
+                        className="object-center object-cover bg-fixed"
                     />
                 </motion.div>
-                {/* Overlay */}
-                <div className="z-[0] absolute h-full w-full inset-0 bg-black/30"></div>
                 {renderItem(currentSlide, itemData)}
                 {showIndicators && (
                     <motion.div

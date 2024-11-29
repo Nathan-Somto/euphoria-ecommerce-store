@@ -13,6 +13,7 @@ import NotificationBadge from "@/components/notification-badge";
 import { CategoryWithProducts } from "@/actions/categories.actions";
 import { Session } from "next-auth";
 import useCart from "@/hooks/use-cart";
+import useWishlist from "@/hooks/use-wishlist";
 const mobileNavItems = (profileId: string | null) => [
     {
         title: 'Shop',
@@ -39,6 +40,7 @@ export default function Navbar({ session, categories }: NavbarProps) {
     const [mobileNavOpen, setMobileNavOpen] = React.useState(false);
     const [searchValue, setSearchValue] = React.useState('');
     const cart = useCart(state => state.cart);
+    const getTotalWishlistItems = useWishlist(state => state.getTotalWishlistProducts)
     const searchParams = useSearchParams();
     React.useEffect(() => {
         const search = searchParams.get('search');
@@ -113,13 +115,14 @@ export default function Navbar({ session, categories }: NavbarProps) {
                             <Button
                                 variant={'neutral'}
                                 size='icon'
-                                className="hidden lg:flex data-[active=true]:text-primary data-[active=true]:!border-primary data-[active=true]:!border-solid data-[active=true]:!border-2"
+                                className="hidden relative lg:flex data-[active=true]:text-primary data-[active=true]:!border-primary data-[active=true]:!border-solid data-[active=true]:!border-2"
                                 data-active={'/favourites' === pathname}
                                 onClick={() => router.push(isLoggedIn ? '/dashboard/wishlist' : '/auth/login')}
                             >
                                 <HeartIcon aria-labelledby="favourites"  >
                                     <title id="favourites">favourites</title>
                                 </HeartIcon>
+                                {getTotalWishlistItems() > 0 && (<NotificationBadge value={getTotalWishlistItems()} size={20} />)}
                             </Button>
                             <Button
                                 variant={'neutral'}
