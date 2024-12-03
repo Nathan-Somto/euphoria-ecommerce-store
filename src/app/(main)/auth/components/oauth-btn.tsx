@@ -53,7 +53,7 @@ export default function OAuthBtn({ provider, disabled = false, callbackUrl }: Pr
             <span className='relative flex items-center justify-center w-6 h-6 mr-2'>
                 <Image src={getProviderIcon()} alt={provider + 'icon'} fill />
             </span>
-            <span>Continue with</span> <span className="capitalize">{" " + provider}</span>
+            <span>Continue with</span> <span className="whitespace-break-spaces">{' '}</span> <span className="capitalize">{provider}</span>
         </Button>
     )
 }
