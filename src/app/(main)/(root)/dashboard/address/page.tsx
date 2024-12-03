@@ -1,6 +1,6 @@
 import React from 'react'
 import DashboardHeader from '../components/dashboard-header'
-import AddressForm from './components/address-form'
+import AddressForm from '../../components/address-form'
 
 export default function AddressPage() {
     return (

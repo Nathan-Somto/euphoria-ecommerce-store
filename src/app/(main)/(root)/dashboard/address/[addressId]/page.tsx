@@ -1,6 +1,6 @@
 import React from 'react'
 import DashboardHeader from '../../components/dashboard-header'
-import AddressForm from '../components/address-form'
+import AddressForm from '../../../components/address-form'
 import { redirect, RedirectType } from 'next/navigation';
 import { getAddress } from '@/actions/address.actions';
 
