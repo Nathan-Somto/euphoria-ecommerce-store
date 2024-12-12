@@ -1,5 +1,5 @@
 import { CartItem } from '@/app/(main)/(root)/cart/components';
-import { CART_STORAGE_KEY } from '@/constants/keys';
+import { CART_STORAGE_KEY } from '@/constants';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 interface CartState {
