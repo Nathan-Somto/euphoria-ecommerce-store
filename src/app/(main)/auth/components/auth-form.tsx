@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { Form } from '@/components/ui/form'
+import { cn } from '@/lib/utils'
 import { zodResolver } from '@hookform/resolvers/zod'
 import Link from 'next/link'
 import React from 'react'
@@ -13,12 +14,15 @@ type Props<T extends ZodRawShape | {}, U extends Record<string, any>> = {
     defaultValues?: DefaultValues<z.infer<z.ZodObject<T>>>
     renderChildren?: (form: UseFormReturn<z.infer<z.ZodObject<T>>>, isLoading: boolean) => React.ReactNode
     btnText?: string
+    className?: string
     showBelowBtn?: boolean
     belowBtnText?: string
     belowBtnLink?: string
     belowBtnLinkText?: string
     showSubmitBtn?: boolean
+    customBelowBtn?: () => React.ReactNode
     actionFn?: (values: z.infer<z.ZodObject<T>>) => Promise<U>
+    onSubmitCb?: (values: z.infer<z.ZodObject<T>>) => void;
 }
 export default function AuthForm<T extends ZodRawShape, U extends Record<string, any>>({
     schema,
@@ -32,6 +36,9 @@ export default function AuthForm<T extends ZodRawShape, U extends Record<string,
     belowBtnLink = "",
     belowBtnLinkText = "",
     showSubmitBtn = true,
+    customBelowBtn: BelowBtn,
+    className,
+    onSubmitCb = () => void 0,
     actionFn = async (values: z.infer<z.ZodObject<T>>): Promise<U> => ({
         error: "method not implemented",
     } as unknown as U)
@@ -47,6 +54,7 @@ export default function AuthForm<T extends ZodRawShape, U extends Record<string,
             if (res?.error) {
                 throw new Error(res.message)
             }
+            onSubmitCb(values);
         }
         catch (err) {
             if (err instanceof Error) {
@@ -60,7 +68,7 @@ export default function AuthForm<T extends ZodRawShape, U extends Record<string,
     // for submission of form
     const isLoading = form.formState.isLoading || form.formState.isSubmitting
     return (
-        <div className='lg:w-[50%] flex-shrink-0 w-[90%] mx-auto max-w-[600px] lg:max-w-none'>
+        <div className={cn('lg:w-[50%] flex-shrink-0 w-[90%] mx-auto max-w-[600px] lg:max-w-none', className)}>
             <Form {...form}>
                 <form className='px-10 py-8' onSubmit={form.handleSubmit(onSubmit)}>
                     <div className='mb-5'>
@@ -71,9 +79,9 @@ export default function AuthForm<T extends ZodRawShape, U extends Record<string,
                         renderChildren && renderChildren(form, isLoading)
                     }
                     {showSubmitBtn && (<Button type='submit' className='min-w-[170px]' disabled={disabled} isLoading={isLoading} showOnlySpinner>{btnText}</Button>)}
-                    {showBelowBtn && (
+                    {BelowBtn ? <BelowBtn /> : showBelowBtn && (
                         <div className='mt-5 text-left'>
-                            <p className="text-sm text-[#3C4242]">
+                            <p className="text-sm text-lite-foreground">
                                 {belowBtnText}{' '}
                                 <Link
                                     href={belowBtnLink
