@@ -12,38 +12,51 @@ import { cn } from '@/lib/utils';
 import { AlertCircleIcon, XIcon } from 'lucide-react';
 import Loader from '@/components/ui/loader';
 import DeleteDialog from '@/components/delete-dialog';
+import { useSession } from 'next-auth/react';
+import AuthDialog from '../../auth/components/auth-dialog';
+import { calculateTotal } from '@/utils/calculateTotal';
 type InvoiceParams = Record<string, number>;
-const getInvoiceData = ({ subTotal, shippingPrice, total }: InvoiceParams) => {
+const getInvoiceData = ({ subTotal, shippingPrice, total, discountRate, originalTotal }: InvoiceParams) => {
     return [
         {
-            label: 'Subtotal',
-            value: subTotal
+            label: 'Original Total',
+            value: originalTotal.toFixed(2)
+        },
+        {
+            label: 'Discount rate',
+            value: `${discountRate.toFixed(2)}%`
+        },
+        {
+            label: 'Sub Total',
+            value: subTotal.toFixed(2)
         },
         {
             label: 'Shipping',
-            value: shippingPrice
+            value: shippingPrice.toFixed(2)
         },
         {
             label: 'Total',
-            value: total
+            value: total.toFixed(2)
         }
     ]
 }
 export default function CartPage() {
+    const session = useSession();
     const [isMounted, setIsMounted] = React.useState(false);
-    const [open, setOpen] = React.useState(false);
+    const [openDelDialog, setOpenDelDialog] = React.useState(false);
+    const [openAuthDialog, setOpenAuthDialog] = React.useState(false);
     const pathname = usePathname();
     const router = useRouter();
     const cart = useCart(state => state.cart);
     const clearCart = useCart(state => state.clearCart);
-    const shippingRate = 1.05;
-    const calculateSubTotal = () => {
-        return cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
-    };
-    const subTotal = calculateSubTotal();
-    const total = subTotal * shippingRate;
-    const shippingPrice = total - subTotal;
-    const invoiceData = getInvoiceData({ subTotal, shippingPrice, total });
+    const { actualTotal, discountedTotal, shippingCost, totalDiscountRate, originalTotal } = calculateTotal(cart);
+    const invoiceData = getInvoiceData({
+        subTotal: discountedTotal,
+        discountRate: totalDiscountRate,
+        shippingPrice: shippingCost,
+        total: actualTotal,
+        originalTotal
+    });
     React.useEffect(() => {
         setIsMounted(true);
     }, []);
@@ -68,29 +81,38 @@ export default function CartPage() {
                                     currentRoute={pathname}
                                 />
                                 <p className='text-secondary-foreground text-sm max-w-[480px] mt-3'>
-                                    Please fill in the fields below and click place order to complete your purchase! Already registered?{' '}
-                                    <Link href={'/auth/login'} className='text-primary font-semibold'>Please login here</Link>
+                                    Please fill in the fields below and click place order to complete your purchase!{' '}
+                                    {!session?.data && (<span>
+                                        Already registered?{' '}
+                                        <Button
+                                            variant={'link'}
+                                            onClick={() => setOpenAuthDialog(true)}
+                                            className='text-primary font-semibold p-0'>
+                                            {' '} Please login here
+                                        </Button>
+                                    </span>
+                                    )}
                                 </p>
                             </div>
                             <div>
                                 <Button
                                     variant={'secondary'}
-                                    onClick={() => setOpen(true)}
+                                    onClick={() => setOpenDelDialog(true)}
                                     className='text-primary-foreground'>
                                     <XIcon className='mr-2 size-5' /> Clear Cart
                                 </Button>
                                 <DeleteDialog
                                     id='clear-cart'
-                                    open={open}
+                                    open={openDelDialog}
                                     customTemplate={{
                                         Icon: AlertCircleIcon,
                                         title: 'Clear Cart',
                                         message: 'Are you sure you want to clear your cart?',
                                     }}
-                                    setOpen={setOpen}
+                                    setOpen={setOpenDelDialog}
                                     customAction={() => {
                                         clearCart()
-                                        setOpen(false)
+                                        setOpenDelDialog(false)
                                     }}
                                 />
                             </div>
@@ -114,23 +136,37 @@ export default function CartPage() {
                             <div className='max-w-[400px] my-6 lg:my-0 pt-10 min-w-[350px] min-h-[300px] flex-shrink-0 w-full  bg-[hsl(0,0%,95%)]'>
                                 <div className='border-b border-b-muted-foreground px-24'>
                                     {
-                                        invoiceData.slice(0, 2).map((item, index) => (
+                                        invoiceData.slice(0, -1).map((item, index) => (
                                             <div key={index} className='flex justify-between items-center font-normal text-primary-foreground'>
                                                 <h4 className='text-lg !font-normal'>{item.label}</h4>
-                                                <p className=' tex-sm'>${item.value.toFixed(2)}</p>
+                                                <p className=' tex-sm'>{item.value}</p>
                                             </div>
                                         ))
                                     }
                                     <div className='flex justify-between mt-4  text-primary-foreground pb-8 items-center'>
                                         <h4 className='text-xl font-semibold'>Total</h4>
-                                        <p className='opacity-80 font-medium text-[17.5px]'>${invoiceData[2].value.toFixed(2)}</p>
+                                        <p className='opacity-80 font-medium text-[17.5px]'>${invoiceData.at(-1)?.value}</p>
                                     </div>
                                 </div>
-                                <Button className='mt-14 w-full max-w-fit mx-auto flex px-8'>Proceed to Checkout</Button>
+                                <Button
+                                    onClick={() => {
+                                        if (session.data) {
+                                            router.push('/checkout');
+                                            return
+                                        }
+                                        setOpenAuthDialog(true);
+                                    }}
+                                    className='mt-14 w-full max-w-fit mx-auto flex px-8'>
+                                    {session.data ? 'Proceed to Checkout' : 'Login to Checkout'}
+                                </Button>
                             </div>
                         </section>
                     </>
                 )}
+            <AuthDialog
+                open={openAuthDialog}
+                setOpen={setOpenAuthDialog}
+            />
         </div>
     );
 }

@@ -10,4 +10,5 @@ export type CartItem = {
     size: Size;
     imageUrl: string;
     unitsInStock: number;
+    discountRate: number | null;
 }
