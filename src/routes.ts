@@ -5,8 +5,9 @@ export const publicRoutes = [
     /^\/products/,                 // matches any route starting with /products
     /^\/api\/auth/,                // matches any route starting with /api/auth i.e for next
     /^\/cart/,                      // matches any route starting with /cart
-    /^\/404/,
-    /^\/style-guide$/
+    /^\/404/,                      // matches any route starting with /404
+    /^\/style-guide$/,
+    /^\/api\/stripe\/webhooks$/   // public for stripe to ping
 ];
 export const privateRoutes = [
     /^\/dashboard/,
