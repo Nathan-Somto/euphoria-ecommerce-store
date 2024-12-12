@@ -86,11 +86,13 @@ function ProductInfoClient({ data }: Props) {
             price: data.price,
             quantity,
             total: calculateTotal(),
-            unitsInStock: data.units
+            unitsInStock: data.units,
+            discountRate: data?.discountRate ?? null
         })
         toast.success('Added to cart')
     }
-    const images = data.images.map((image, index) => ({ src: image, alt: `${data.name} image ${index + 1} ` }))
+    const images = data.images.map((image, index) => ({ src: image, alt: `${data.name} image ${index + 1} ` }));
+    const isInStock = data.units - getQuantity() > 0;
     return (
         <>
             <section className='grid lg:grid-cols-2 mb-5 px-12 lg:gap-x-16 max-w-screen-xl mx-auto lg:min-h-screen w-full '>
@@ -153,8 +155,15 @@ function ProductInfoClient({ data }: Props) {
                                     delay: 0.4
                                 }
                             }}
-                            className='lg:text-6xl text-4xl leading-[35px] mb-4 font-bold lg:leading-[60px]'>{data.name}</motion.h1>
-                        <div className='flex items-center gap-x-7 text-[#807D7E] mb-5'>
+                            className='lg:text-6xl flex items-center text-4xl leading-[35px] mb-4 font-bold lg:leading-[60px]'>
+                            <span>{data.name}</span>
+                            {data.discountRate !== null && (
+                                <span className="inline-block bg-teal-600 text-sm px-2 text-white/80 ml-2 rounded-md">
+                                    -{data.discountRate}%
+                                </span>
+                            )}
+                        </motion.h1>
+                        <div className='flex items-center gap-x-7 text-neutral-foreground mb-5'>
                             <div className='flex items-center gap-x-2'>
                                 <div className='flex items-center gap-0.5'>{renderStars(5)}</div>
                                 <p className=' text-lg'>4.5</p>
@@ -169,15 +178,23 @@ function ProductInfoClient({ data }: Props) {
                                 <p className=''>120 {pluralize('comment', 2)}</p>
                             </div>
                             {/* Units Left */}
-                            <div className="flex items-center gap-x-2 text-lg ">
-                                <BoxIcon size={22} />
-                                <p>
-                                    <span className="font-semibold text-gray-800">
-                                        {data.units - getQuantity()}{' '}
-                                    </span>
-                                    units left
-                                </p>
-                            </div>
+                            {
+                                isInStock &&
+                                <div className="flex items-center gap-x-2 text-lg ">
+                                    <BoxIcon size={22} />
+                                    {
+                                        (data.units - getQuantity()) !== 0 ?
+                                            <p>
+                                                <span className="font-semibold text-gray-800">
+                                                    {data.units - getQuantity()}{' '}
+                                                </span>
+                                                {pluralize('unit', data.units - getQuantity())} left
+                                            </p>
+                                            :
+                                            <p>no units left</p>
+                                    }
+                                </div>
+                            }
                         </div>
                         <div>
                             <h3 className='text-lg mb-3.5 font-medium text-[#3F4646]'>Select a Size</h3>
@@ -214,11 +231,11 @@ function ProductInfoClient({ data }: Props) {
                         <div className='flex items-center gap-6 mb-6 mt-5 flex-wrap'>
                             <Button
                                 onClick={onAddToCart}
-                                disabled={isInCart}
+                                disabled={isInCart || !isInStock}
                                 className='min-w-[200px] flex-shrink-0 tracking-[0%] text-lg h-[46px]'
                             >
                                 <LucideShoppingCart className='mr-2 size-4' />
-                                {isInCart ? 'Added to Cart' : 'Add to Cart'}
+                                {!isInStock ? 'Out of Stock' : isInCart ? 'Added to Cart' : 'Add to Cart'}
                             </Button>
                             <Button variant={'outline'} className='min-w-[138px] h-[46px]' >${
                                 (data.price * getQuantity()).toFixed(2)

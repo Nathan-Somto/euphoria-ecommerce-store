@@ -72,7 +72,8 @@ export default function ProductCard({
             quantity: 1,
             size: sizes[0],
             total: price * 1,
-            unitsInStock
+            unitsInStock,
+            discountRate
         });
         toast.success(`added ${name.slice(0, 40) + "..."} to cart!`)
     };
