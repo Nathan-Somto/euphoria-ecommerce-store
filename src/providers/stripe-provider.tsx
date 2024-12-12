@@ -2,11 +2,13 @@
 import { CartItem } from '@/app/(main)/(root)/cart/components'
 import { Button } from '@/components/ui/button'
 import Loader from '@/components/ui/loader'
-import { CART_STORAGE_KEY } from '@/constants/keys'
+import { CART_STORAGE_KEY } from '@/constants'
+import { IntentSchema } from '@/schema/intent.schema'
 import { errorLogger } from '@/utils/errorLogger'
 import { Elements } from '@stripe/react-stripe-js'
 import { loadStripe, type Stripe } from '@stripe/stripe-js'
 import { RotateCwIcon } from 'lucide-react'
+import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import React, { PropsWithChildren } from 'react'
 type LocalCartState = {
@@ -16,20 +18,26 @@ type LocalCartState = {
 }
 type Props = PropsWithChildren<{
     pk?: string
+    userId: string
 }>
 /**
  *  
- * @param pk - stripe public key
+ *@param {Object} Props
+ * @param {string} Props.pk - stripe publishable key 
+ * @param {string} Props.userId - the user id
  * 
  */
-export default function StripeProvider({ children, pk }: Props) {
+export default function StripeProvider({ children, pk, userId }: Props) {
     const router = useRouter();
     const [isLoading, setIsLoading] = React.useState(true);
     const [stripe, setStripe] = React.useState<Stripe | null>(null)
     const [clientSecret, setClientSecret] = React.useState<string | null>(null)
     const [error, setError] = React.useState(false)
+    const hasRun = React.useRef(false)
     React.useEffect(() => {
-        (async () => {
+        if (hasRun.current) return;
+        hasRun.current = true;
+        const createPaymentIntent = async () => {
             if (!isLoading) return;
             try {
                 // local storage is used to retrieve the cart items because:
@@ -49,15 +57,19 @@ export default function StripeProvider({ children, pk }: Props) {
                 if (!stripeRes) {
                     throw new Error('Failed to load stripe');
                 }
-                const body = JSON.stringify({
+                const reqBody: IntentSchema = {
                     items: itemsInCart
                         .map(item =>
                         ({
                             price: item.price,
-                            quantity: item.quantity
+                            quantity: item.quantity,
+                            productId: item.id,
+                            discountRate: item.discountRate
                         })),
-                    currency: 'usd'
-                })
+                    currency: 'usd',
+                    userId
+                }
+                const body = JSON.stringify(reqBody)
                 const postRes = await fetch('/api/stripe', {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
@@ -65,7 +77,7 @@ export default function StripeProvider({ children, pk }: Props) {
                 })
                 const data = await postRes.json()
                 if (!postRes.ok) {
-                    throw new Error(`${data}`)
+                    throw new Error(`${data.message}`)
                 }
                 setClientSecret(data.client_secret)
                 setStripe(stripeRes)
@@ -75,21 +87,24 @@ export default function StripeProvider({ children, pk }: Props) {
             } finally {
                 setIsLoading(false)
             }
-        })()
+        }
+        createPaymentIntent()
     }, []);
     if (isLoading || error) {
         return <div className='h-screen w-full bg-background grid place-items-center'>
             {error ?
                 <div>
+                    <h3 className='mb-4 text-5xl '>ERROR!</h3>
                     <p
                         className='text-center mb-2 text-neutral-400'>
                         An Error just occured while loading the checkout page
                     </p>
                     <Button
+                        className='gap-x-2'
                         onClick={() =>
                             router.refresh()
                         }>
-                        <RotateCwIcon />
+                        <RotateCwIcon className='size-4' />
                         Retry
                     </Button>
                 </div> : <Loader />
