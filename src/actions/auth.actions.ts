@@ -183,7 +183,7 @@ export async function loginUser(
         throwRedirectError: true
     })
 }
-export async function registerUser(values: SignUpSchema) {
+export async function registerUser(values: SignUpSchema, redirectTo = '/') {
     return await tryCatchFn({
         cb: async () => {
             const user = await getUserByEmail(values.email)
@@ -211,7 +211,7 @@ export async function registerUser(values: SignUpSchema) {
                 await signIn('credentials', {
                     email: res.email,
                     password: values.password,
-                    redirectTo: '/'
+                    redirectTo
                 })
             }
             return {

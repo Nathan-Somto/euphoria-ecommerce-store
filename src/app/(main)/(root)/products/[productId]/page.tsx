@@ -3,15 +3,10 @@ import ProductInfoClient from "../components/product-info-client";
 import { ProductCardSkeleton } from "../../components/product/product-row-skeleton";
 import SimilarProducts from "../components/similar-products";
 import SectionHeading from "../../components/section-heading";
-import { unstable_cache as cache } from "next/cache";
 import { getProduct } from "@/actions/products.actions";
-import { notFound, redirect, RedirectType } from "next/navigation";
-const getProductData = cache(async (id: string) => await getProduct(id), ['product'], {
-    revalidate: false,
-    tags: ['product']
-});
+import { redirect, RedirectType } from "next/navigation";
 export default async function ProductPage({ params: { productId: id } }: { params: { productId: string } }) {
-    const { data, message } = await getProductData(id);
+    const { data, message } = await getProduct(id);
     console.log("the message: ", message !== undefined);
     if (!data || message !== undefined) {
         console.log("not found");

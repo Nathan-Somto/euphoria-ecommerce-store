@@ -18,15 +18,16 @@ import { useRouter } from 'next/navigation';
 type Props = {
     initialData?: Address
     onSubmitCb?: (data: Address) => void
+    disabled?: boolean
 }
-export default function AddressForm({ initialData, onSubmitCb }: Props) {
+export default function AddressForm({ initialData, onSubmitCb, disabled: parentDisabled }: Props) {
     const router = useRouter();
     const form = useForm<z.infer<typeof addressSchema>>({
         resolver: zodResolver(addressSchema),
         defaultValues: initialData,
         mode: 'onBlur'
     })
-    const disabled = !form.formState.isValid
+    const disabled = !form.formState.isValid || !!parentDisabled
     const onSubmit = async (data: z.infer<typeof addressSchema>) => {
         try {
             if (data.phoneNumber === '+234801756789') {
