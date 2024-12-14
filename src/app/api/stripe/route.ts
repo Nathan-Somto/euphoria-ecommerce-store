@@ -49,7 +49,7 @@ export async function POST(req: Request) {
                     userId,
                     address: '',
                     orderedProducts: {
-                        create: items.map(item => ({ productId: item.productId, quantity: item.quantity })),
+                        create: items.map(item => ({ productId: item.productId, quantity: item.quantity, color: item.color, size: item.size })),
                     },
                 },
                 select: { id: true },
