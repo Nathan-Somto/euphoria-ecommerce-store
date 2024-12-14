@@ -1,6 +1,10 @@
 'use client';
 import React from 'react';
 import { Button } from '@/components/ui/button';
+import Timeline from '@/components/timeline/timeline';
+import Pagination from '@/components/pagination';
+import SearchBar from '@/components/search-bar';
+import PriceRangeSlider from '@/components/price-range-slider';
 
 export default function StyleGuidePage() {
     return (
@@ -50,6 +54,67 @@ export default function StyleGuidePage() {
                     <Button variant="neutral" className="px-4 py-2">Neutral Button</Button>
                     <Button variant="elevated" className="px-4 py-2">Elevated Button</Button>
                 </div>
+            </section>
+            {/* Timeline section */}
+            <section>
+                <h3 className="text-2xl font-semibold text-gray-700">Timeline</h3>
+                <p>Vertical</p>
+                <Timeline
+                    items={[
+                        { label: 'Order Placed', hint: 'Order was placed at 15th june 2024' },
+                        { label: 'Paid', hint: "27th june 2024" },
+                        { label: 'Order Confirmed', hint: '1st july 2024' },
+                        { label: 'Delivered', hint: '12th july 2024' }
+                    ]}
+                    progress={100}
+                    className='w-[500px]'
+                    variant='vertical'
+                />
+                <p>Horizontal</p>
+                <Timeline
+                    items={[
+                        { label: 'Order Placed', hint: 'Order was placed at 15th june 2024' },
+                        { label: 'Paid', hint: "27th june 2024" },
+                        { label: 'Order Confirmed', hint: '1st july 2024' },
+                        { label: 'Delivered', hint: '12th july 2024' }
+                    ]}
+                    progress={100}
+                    className='w-[500px]'
+                    variant='horizontal'
+                />
+            </section>
+            {/* Pagination section */}
+            <section>
+                <h3 className="text-2xl font-semibold text-gray-700">Pagination</h3>
+                <Pagination
+                    currentPage={1}
+                    onNext={() => { }}
+                    totalPages={4}
+                    onPrevious={function (): void {
+                    }}
+                />
+            </section>
+            {/* Search bar */}
+            <section>
+                <h3 className="text-2xl font-semibold text-gray-700 mb-2">Search bar</h3>
+                <SearchBar
+                    onChange={function (value: string): void {
+                        console.log(value)
+                    }} value={''}
+                />
+            </section>
+            {/* Price Range Slider */}
+            <section>
+                <h3 className="text-2xl font-semibold text-gray-700 mb-2">Price Range Slider</h3>
+                <PriceRangeSlider
+                    initialMinValue={10}
+                    initialMaxValue={70}
+                    min={0}
+                    max={100}
+                    onChange={function (min: number, max: number): void {
+                        console.log(min, max)
+                    }}
+                />
             </section>
         </div>
     );
