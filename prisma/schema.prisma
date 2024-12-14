@@ -130,6 +130,9 @@ model Order {
   id              String           @id @default(auto()) @map("_id") @db.ObjectId
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
+  paidTime        DateTime?
+  deliveredTime   DateTime?
+  failedTime      DateTime?
   user            User             @relation(fields: [userId], references: [id])
   userId          String           @db.ObjectId
   orderedProducts OrderedProduct[]
@@ -142,6 +145,8 @@ model OrderedProduct {
   productId String?  @db.ObjectId
   Product   Product? @relation(fields: [productId], references: [id])
   quantity  Int      @default(1)
+  color     String?
+  size      Size?
   Order     Order?   @relation(fields: [orderId], references: [id])
   orderId   String?  @db.ObjectId
 }
@@ -169,7 +174,7 @@ model Testimonial {
 enum Status {
   PENDING
   DELIVERED
-  CANCELLED
+  FAILED
   PAID
 }
 
