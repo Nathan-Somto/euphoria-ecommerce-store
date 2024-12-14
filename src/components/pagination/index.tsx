@@ -15,12 +15,12 @@ export default function Pagination({
 }: PaginationProps) {
   return (
     <div className="flex items-center justify-center space-x-4 py-4">
-     
+
       <Button
         variant="outline"
         onClick={onPrevious}
         disabled={disablePrevious || currentPage === 1}
-        className="p-2"
+        className="p-2 disabled:opacity-50 disabled:!cursor-not-allowed"
       >
         <ChevronLeft className="w-4 h-4" />
       </Button>
@@ -34,7 +34,7 @@ export default function Pagination({
         variant="outline"
         onClick={onNext}
         disabled={disableNext || currentPage === totalPages}
-        className="p-2"
+        className="p-2 disabled:opacity-50 disabled:!cursor-not-allowed"
       >
         <ChevronRight className="w-4 h-4" />
       </Button>
