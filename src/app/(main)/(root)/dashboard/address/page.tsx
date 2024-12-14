@@ -8,6 +8,7 @@ export default function AddressPage() {
             <DashboardHeader
                 title='My Info'
                 subTitle='Add Address'
+                showBackBtn
             />
             <div className='my-3' />
             <AddressForm
