@@ -36,7 +36,12 @@ export default function DashboardSidebar({ username }: Props) {
         mobileBreakpoint: 1023
     });
     const pathname = usePathname();
-    const lastDynamicLink = items.find(item => item.href === pathname);
+    const isRoute = (href: string) => {
+        if (href === '/dashboard' && pathname.includes('address')) return true
+        if (href === '/dashboard/orders' && pathname.match(/^\/dashboard\/orders\//)) return true
+        return href === pathname;
+    }
+    const lastDynamicLink = items.find(item => isRoute(item.href));
     const dynamicLinks = [
         {
             label: "Home",
@@ -63,10 +68,7 @@ export default function DashboardSidebar({ username }: Props) {
         }
     }, [isMobile]);
     console.log("isMobile", isMobile);
-    const isRoute = (href: string) => {
-        if (href === '/dashboard' && pathname.includes('address')) return true
-        return href === pathname;
-    }
+
     return (
         <div
             className={cn('top-20  lg:sticky  fixed block left-0 z-[50] h-0  border-r-neutral-300 border-r w-0', isOpen && 'h-[calc(100vh-20*0.25rem)] w-[250px] overflow-hidden')}>
