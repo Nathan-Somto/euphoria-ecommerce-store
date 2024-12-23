@@ -3,52 +3,32 @@ import Carousel from '@/components/carousel';
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
-
-function Banner() {
+import { cachedHomeData } from '@/actions/home.actions';
+interface Props {
+  data: ServerActionReturnType<typeof cachedHomeData>['banner'];
+}
+function Banner({ data = [] }: Props) {
+  const imagesWithAlt = data.map(({ image, title }) => ({ imgSrc: image, alt: `${title} banner` }));
+  // change discount rate number to discount text
+  const normalizedData = data.map((item) => (
+    {
+      ...item,
+      discountText: item.discountRate ?
+        (item.discountRate < 0)
+          ? 'New Arrival'
+          : `${item.discountRate}% off` : null,
+    }
+  ))
   return (
     <header className="h-[calc(100vh-(20*0.25rem))] w-full mb-8">
       <Carousel
         width="100%"
         height="100%"
-        imgData={[
-          {
-            imgSrc: '/carousel/banner-1.jpg',
-            alt: 'banner1'
-          },
-          {
-            imgSrc: '/carousel/banner-2.png',
-            alt: 'banner2'
-          },
-          {
-            imgSrc: '/carousel/banner-3.png',
-            alt: 'banner3'
-          }
-        ]}
+        imgData={imagesWithAlt}
         duration={7000}
         shouldAutoPlay={true}
         showIndicators={true}
-        itemData={[
-          {
-            discountText: '50% off',
-            discountColor: 'rgb(250,30,0)',
-            title: "Women's Winter Collection",
-            description: 'Get the best deals on winter wear',
-            buttonText: 'Shop Now'
-          },
-          {
-            discountText: null,
-            title: 'Men’s Fashion',
-            description: 'Discover stylish choices for all seasons',
-            buttonText: 'Explore Now'
-          },
-          {
-            discountText: 'New Arrival',
-            discountColor: 'rgb(0, 200, 0)',
-            title: 'Exclusive Spring Collection',
-            description: 'Refresh your wardrobe with the latest trends',
-            buttonText: 'See Collection'
-          }
-        ]}
+        itemData={normalizedData}
         renderItem={(currentSlide, itemData, showImmediately = false) => {
           const slide = itemData[currentSlide];
           return (

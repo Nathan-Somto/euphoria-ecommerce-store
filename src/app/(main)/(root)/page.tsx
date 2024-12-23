@@ -7,39 +7,31 @@ import SearchResultsScreen from "./components/home/search-results";
 import { ProductRow } from "./components/product/product-row";
 import { getCachedProducts } from "@/actions/products.actions";
 import Articles from "./components/home/articles";
+import { cachedHomeData } from "@/actions/home.actions";
 export default async function Home() {
-  //TODO: fetch products from server
   const { data: products } = await getCachedProducts();
-  //TODO: fetch banner data from server
-  //TODO: fetch categories from server
-  //TODO: fetch testimonials from server
+  const { data: homeData } = await cachedHomeData();
+  const normalizedCategories = homeData?.categories?.map(({ products, createdAt, ...category }) => ({
+    ...category,
+    totalProducts: products.length,
+    image: category.image ?? 'https://via.placeholder.com/150',
+  }));
   return (
     <div className="min-h-screen relative">
       <SearchResultsScreen products={products ?? []} />
-      <Banner />
+      <Banner data={homeData?.banner ?? []} />
       <CategoryRow
-        data={[
-          {
-            id: '1',
-            name: 'Men\'s Clothing',
-            image: '/dummy/category-2.jpg',
-            totalProducts: 1
-          },
-          {
-            id: '2',
-            name: 'Women\'s Clothing',
-            image: '/dummy/category-1.jpg',
-            totalProducts: 6
-          }
-        ]} />
+        data={normalizedCategories ?? []}
+      />
       <ProductRow headingFilter="Featured" data={products ?? []} />
       <Articles />
       <WhyUs />
-      {/*TODO: replace with dynamic response from categories */}
       <ProductRow headingFilter="men's clothing" data={products ?? []} />
       <ProductRow headingFilter="women's clothing" data={products ?? []} />
       <Brands />
-      <Testimonials />
+      <Testimonials
+        data={homeData?.testimonials ?? []}
+      />
     </div>
   )
 }

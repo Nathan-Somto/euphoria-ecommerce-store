@@ -90,7 +90,7 @@ export default function Carousel({
                         transition={{ delay: 0.35, duration: 0.45, ease: [0.31, 0.11, 0.41, 0.51] }}
                         src={prevImage.imgSrc}
                         alt={prevImage.alt}
-                        className="object-center object-cover w-full h-full bg-fixed"
+                        className="object-top object-cover w-full h-full bg-fixed"
                     />
                 </motion.div>
                 <motion.div
