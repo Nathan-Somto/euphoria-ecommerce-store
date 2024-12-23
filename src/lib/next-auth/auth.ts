@@ -37,9 +37,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 token.role = session.user.role
                 token.username = session.user.username
                 token.profilePhoto = session.user.profilePhoto
-                token.isOAuth = session.user.isOAuth
                 token.isEmailVerified = session.user.isEmailVerified
                 token.name = session.user.name
+                token.isDisabled = session.user.isDisabled
                 return token
             }
             const existingUser = await getUserByEmail(token.email ?? user.email ?? '');
@@ -52,9 +52,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             token.role = existingUser.data.role
             token.username = existingUser.data.username
             token.profilePhoto = existingUser.data.profilePhoto
-            token.isOAuth = account?.provider !== 'credentials'
             token.isEmailVerified = existingUser.data.isEmailVerified
             token.name = existingUser.data.name
+            token.isDisabled = existingUser.data.isDisabled
             return token
         },
         session: ({ session, token }) => {
@@ -64,8 +64,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 session.user.role = (token?.role ?? 'CUSTOMER') as Role
                 session.user.username = token.username as string
                 session.user.profilePhoto = token.profilePhoto as string
-                session.user.isOAuth = token.isOAuth as boolean
                 session.user.name = token.name as string
+                session.user.isDisabled = token.isDisabled as boolean
             }
             return session
         }

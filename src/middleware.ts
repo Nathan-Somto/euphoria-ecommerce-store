@@ -1,7 +1,7 @@
 import { authConfig } from "@/lib/next-auth"
 import NextAuth from "next-auth"
 import { NextResponse as Response } from "next/server"
-import { adminRoute, privateRoutes, publicRoutes, RouteTest } from "./routes"
+import { adminRoute, disabledUserRoutes, privateRoutes, publicRoutes, RouteTest } from "./routes"
 // key things to note:
 // block users who are not signed in from accessing private routes
 // when i access a private route, i should be redirected to the sign in page the route i tried to access
@@ -14,7 +14,6 @@ export default auth((req) => {
     const isLoggedIn = !!req.auth
     const url = req.nextUrl;
     const { isRoute: isPublicRoute } = RouteTest(publicRoutes, url.pathname);
-    const { isRoute: isPrivateRoute } = RouteTest(privateRoutes, url.pathname);
     const isAdminRoute = url.pathname.startsWith(adminRoute);
     const isAuthRoute = url.pathname.startsWith('/auth');
     let callbackUrl = `${url.pathname}${url.search}`;
@@ -24,16 +23,10 @@ export default auth((req) => {
         if (isAdminRoute && !isLoggedIn) {
             return Response.redirect(new URL(`/admin/sign-in?blockedRoute=${encodedCallbackUrl}`, url))
         }
-        /* if (!isPublicRoute || !isPrivateRoute) {
-            return Response.redirect(new URL('/404', url));
-        } */
         if (!isLoggedIn && !isPublicRoute) {
             return Response.redirect(new URL(`/auth/login?blockedRoute=${encodedCallbackUrl}`, url))
         }
         if (isAuthRoute && isLoggedIn) {
-            return Response.redirect(new URL('/', url))
-        }
-        if (isAdminRoute && req.auth?.user.role !== 'ADMIN') {
             return Response.redirect(new URL('/', url))
         }
     }

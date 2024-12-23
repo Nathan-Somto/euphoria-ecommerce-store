@@ -31,7 +31,8 @@ export function CustomPrismaAdapter(
                 username: user.username,
                 image: user.profilePhoto,
                 isEmailVerified: user.isEmailVerified,
-                role: user.role
+                role: user.role,
+                isDisabled: user.isDisabled
             };
         }
     }
