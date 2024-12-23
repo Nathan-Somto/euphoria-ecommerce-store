@@ -42,8 +42,8 @@ function Banner({ data = [] }: Props) {
                 {slide.discountText && (
                   <motion.div
                     className="text-white max-w-fit  rounded-full text-sm lg:text-[16.5px] px-2 py-0.5 lg:px-4 lg:py-1 inline-block font-semibold uppercase mb-2"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
+                    initial={showImmediately ? undefined : { opacity: 0 }}
+                    animate={showImmediately ? undefined : { opacity: 1 }}
                     transition={{ delay: 1.5, duration: 0.8 }}
                     style={{ backgroundColor: slide?.discountColor }}
                   >
@@ -51,9 +51,10 @@ function Banner({ data = [] }: Props) {
                   </motion.div>
                 )}
                 <motion.h1
-                  className="lg:text-6xl md:text-4xl text-3xl lg:leading-[60px]  font-bold text-white max-h-[600px]  overlfow-hidden flex flex-wrap"
-                  initial="hidden"
-                  animate="visible"
+
+                  className="lg:text-6xl lg:max-w-[500px] max-w-[350px] md:max-w-[400px]  md:text-4xl text-3xl lg:leading-[60px]  font-bold text-white max-h-[600px]  overlfow-hidden flex flex-wrap"
+                  initial={showImmediately ? undefined : "hidden"}
+                  animate={showImmediately ? undefined : "visible"}
                   variants={{
                     hidden: {},
                     visible: {
@@ -97,15 +98,15 @@ function Banner({ data = [] }: Props) {
                 </motion.h1>
                 <motion.p
                   className="lg:text-lg md:text-[16.5px] text-sm text-white w-[80%] opacity-75"
-                  initial={{ y: 50, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
+                  initial={showImmediately ? undefined : { y: 50, opacity: 0 }}
+                  animate={showImmediately ? undefined : { y: 0, opacity: 1 }}
                   transition={{ delay: 1.5, duration: 0.8 }}
                 >
                   {slide.description}
                 </motion.p>
                 <motion.div
-                  initial={{ scale: 0.9, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
+                  initial={showImmediately ? undefined : { scale: 0.9, opacity: 0 }}
+                  animate={showImmediately ? undefined : { scale: 1, opacity: 1 }}
                   transition={{ delay: 1.8, duration: 0.5 }}
                 >
                   <Button className="bg-white text-black px-4 py-2 mt-4 hover:bg-white hover:opacity-50">
