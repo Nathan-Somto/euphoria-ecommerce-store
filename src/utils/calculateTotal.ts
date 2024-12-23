@@ -1,4 +1,5 @@
 import { SHIPPING_RATE } from "@/constants";
+import { clamp } from "./clamp";
 // type TotalLike a record that must contain discountRate, price and quantity
 type TotalLike<T extends Record<string, any>> = T & {
     discountRate: number | null;
@@ -14,9 +15,7 @@ type ResultTotal = {
     shippingCost: number;
 }
 export function calculateTotal<T extends Record<string, any>>(items: TotalLike<T>): ResultTotal {
-    function clamp(min: number, max: number, value: number) {
-        return Math.min(Math.max(value, min), max);
-    }
+
     // Calculate just the original price and total discount rate
     const { originalTotal, totalDiscountRate } = items.reduce((acc, item) => {
         const price = item.price * item.quantity;

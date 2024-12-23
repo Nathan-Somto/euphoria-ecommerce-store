@@ -17,6 +17,7 @@ export default async function EditAddressPage({ params: {
             <DashboardHeader
                 title='My Info'
                 subTitle='Edit Address'
+                showBackBtn
             />
             <div className='my-3' />
             <AddressForm

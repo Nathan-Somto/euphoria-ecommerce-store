@@ -10,7 +10,7 @@ declare module "next-auth" {
       role: Role
       username: string
       isEmailVerified: boolean
-      isOAuth: boolean
+      isDisabled: boolean
       name: string
     }
   }
@@ -24,5 +24,6 @@ declare module "next-auth/adapters" {
     isEmailVerified: boolean
     email: string
     role: Role
+    isDisabled: boolean
   }
 }

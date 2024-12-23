@@ -22,7 +22,8 @@ export async function POST(request: Request) {
                     },
                     data: {
                         status: "PAID",
-                        address: constructAddressString(session?.shipping?.address)
+                        address: constructAddressString(session?.shipping?.address),
+                        paidTime: new Date()
                     },
                     select: {
                         orderedProducts: {
@@ -76,8 +77,9 @@ export async function POST(request: Request) {
                         id: session?.metadata?.orderId
                     },
                     data: {
-                        status: "CANCELLED",
-                        address: constructAddressString(session?.shipping?.address)
+                        status: "FAILED",
+                        address: constructAddressString(session?.shipping?.address),
+                        failedTime: new Date()
                     }
                 });
                 break;

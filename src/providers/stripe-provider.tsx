@@ -64,7 +64,9 @@ export default function StripeProvider({ children, pk, userId }: Props) {
                             price: item.price,
                             quantity: item.quantity,
                             productId: item.id,
-                            discountRate: item.discountRate
+                            discountRate: item.discountRate,
+                            color: item.color,
+                            size: item.size
                         })),
                     currency: 'usd',
                     userId

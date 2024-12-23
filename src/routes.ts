@@ -13,6 +13,11 @@ export const privateRoutes = [
     /^\/dashboard/,
     /^\/confirmed-order$/
 ]
+// routes that disabled users can't access
+export const disabledUserRoutes = [
+    ...privateRoutes,
+    /^\/checkout/,
+]
 export function RouteTest(routes: RegExp[], pathname: string): { isRoute: boolean } {
     return ({ isRoute: routes.some((route) => route.test(pathname)) });
 }
