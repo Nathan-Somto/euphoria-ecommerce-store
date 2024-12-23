@@ -43,14 +43,6 @@ export default function Carousel({
     };
 
 
-    const handleDragEnd = (event: any, info: any) => {
-        if (info.offset.x > 100) {
-            paginate(-1);
-        } else if (info.offset.x < -100) {
-            paginate(1);
-        }
-    };
-
     useEffect(() => {
         if (shouldAutoPlay) {
             const timer = setInterval(() => paginate(1), duration);
@@ -59,8 +51,6 @@ export default function Carousel({
     }, [currentSlide, shouldAutoPlay, duration]);
     const currentImage = imgData[currentSlide];
     const prevImage = imgData[prevSlide];
-    console.log("the prev: ", prevSlide);
-    console.log("the current: ", currentSlide)
     return (
         <AnimatePresence mode="wait" >
             <motion.div
