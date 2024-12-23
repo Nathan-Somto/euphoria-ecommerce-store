@@ -6,6 +6,7 @@ import Testimonials from "./components/home/testimonials";
 import SearchResultsScreen from "./components/home/search-results";
 import { ProductRow } from "./components/product/product-row";
 import { getCachedProducts } from "@/actions/products.actions";
+import Articles from "./components/home/articles";
 export default async function Home() {
   //TODO: fetch products from server
   const { data: products } = await getCachedProducts();
@@ -32,6 +33,7 @@ export default async function Home() {
           }
         ]} />
       <ProductRow headingFilter="Featured" data={products ?? []} />
+      <Articles />
       <WhyUs />
       {/*TODO: replace with dynamic response from categories */}
       <ProductRow headingFilter="men's clothing" data={products ?? []} />
