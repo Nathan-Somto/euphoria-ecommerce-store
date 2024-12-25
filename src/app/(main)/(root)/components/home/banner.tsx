@@ -3,52 +3,32 @@ import Carousel from '@/components/carousel';
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
-
-function Banner() {
+import { cachedHomeData } from '@/actions/home.actions';
+interface Props {
+  data: ServerActionReturnType<typeof cachedHomeData>['banner'];
+}
+function Banner({ data = [] }: Props) {
+  const imagesWithAlt = data.map(({ image, title }) => ({ imgSrc: image, alt: `${title} banner` }));
+  // change discount rate number to discount text
+  const normalizedData = data.map((item) => (
+    {
+      ...item,
+      discountText: item.discountRate ?
+        (item.discountRate < 0)
+          ? 'New Arrival'
+          : `${item.discountRate}% off` : null,
+    }
+  ))
   return (
     <header className="h-[calc(100vh-(20*0.25rem))] w-full mb-8">
       <Carousel
         width="100%"
         height="100%"
-        imgData={[
-          {
-            imgSrc: '/carousel/banner-1.jpg',
-            alt: 'banner1'
-          },
-          {
-            imgSrc: '/carousel/banner-2.png',
-            alt: 'banner2'
-          },
-          {
-            imgSrc: '/carousel/banner-3.png',
-            alt: 'banner3'
-          }
-        ]}
+        imgData={imagesWithAlt}
         duration={7000}
         shouldAutoPlay={true}
         showIndicators={true}
-        itemData={[
-          {
-            discountText: '50% off',
-            discountColor: 'rgb(250,30,0)',
-            title: "Women's Winter Collection",
-            description: 'Get the best deals on winter wear',
-            buttonText: 'Shop Now'
-          },
-          {
-            discountText: null,
-            title: 'Men’s Fashion',
-            description: 'Discover stylish choices for all seasons',
-            buttonText: 'Explore Now'
-          },
-          {
-            discountText: 'New Arrival',
-            discountColor: 'rgb(0, 200, 0)',
-            title: 'Exclusive Spring Collection',
-            description: 'Refresh your wardrobe with the latest trends',
-            buttonText: 'See Collection'
-          }
-        ]}
+        itemData={normalizedData}
         renderItem={(currentSlide, itemData, showImmediately = false) => {
           const slide = itemData[currentSlide];
           return (
@@ -62,8 +42,8 @@ function Banner() {
                 {slide.discountText && (
                   <motion.div
                     className="text-white max-w-fit  rounded-full text-sm lg:text-[16.5px] px-2 py-0.5 lg:px-4 lg:py-1 inline-block font-semibold uppercase mb-2"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
+                    initial={showImmediately ? undefined : { opacity: 0 }}
+                    animate={showImmediately ? undefined : { opacity: 1 }}
                     transition={{ delay: 1.5, duration: 0.8 }}
                     style={{ backgroundColor: slide?.discountColor }}
                   >
@@ -71,9 +51,10 @@ function Banner() {
                   </motion.div>
                 )}
                 <motion.h1
-                  className="lg:text-6xl md:text-4xl text-3xl lg:leading-[60px]  font-bold text-white max-h-[600px]  overlfow-hidden flex flex-wrap"
-                  initial="hidden"
-                  animate="visible"
+
+                  className="lg:text-6xl lg:max-w-[500px] max-w-[350px] md:max-w-[400px]  md:text-4xl text-3xl lg:leading-[60px]  font-bold text-white max-h-[600px]  overlfow-hidden flex flex-wrap"
+                  initial={showImmediately ? undefined : "hidden"}
+                  animate={showImmediately ? undefined : "visible"}
                   variants={{
                     hidden: {},
                     visible: {
@@ -117,15 +98,15 @@ function Banner() {
                 </motion.h1>
                 <motion.p
                   className="lg:text-lg md:text-[16.5px] text-sm text-white w-[80%] opacity-75"
-                  initial={{ y: 50, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
+                  initial={showImmediately ? undefined : { y: 50, opacity: 0 }}
+                  animate={showImmediately ? undefined : { y: 0, opacity: 1 }}
                   transition={{ delay: 1.5, duration: 0.8 }}
                 >
                   {slide.description}
                 </motion.p>
                 <motion.div
-                  initial={{ scale: 0.9, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
+                  initial={showImmediately ? undefined : { scale: 0.9, opacity: 0 }}
+                  animate={showImmediately ? undefined : { scale: 1, opacity: 1 }}
                   transition={{ delay: 1.8, duration: 0.5 }}
                 >
                   <Button className="bg-white text-black px-4 py-2 mt-4 hover:bg-white hover:opacity-50">
