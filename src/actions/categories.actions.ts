@@ -8,6 +8,7 @@ interface Category {
   id: string;
   name: string;
   createdAt: Date;
+  image: string | null;
 }
 
 export interface CategoryWithProducts extends Category {
@@ -26,6 +27,7 @@ export async function getCategories(
           id: true,
           name: true,
           createdAt: true,
+          image: true,
           products: {
             select: {
               id: true,
@@ -42,6 +44,7 @@ export async function getCategories(
         id: true,
         name: true,
         createdAt: true,
+        image: true
       },
     });
     return {
