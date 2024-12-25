@@ -1,7 +1,7 @@
 'use client';
 import SearchBar from "@/components/search-bar";
 import { Button } from "@/components/ui/button";
-import { HeartIcon, ShoppingCart, User2Icon } from "lucide-react";
+import { HeartIcon, ShoppingCart, User2Icon, UserCog2Icon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -14,12 +14,18 @@ import { CategoryWithProducts } from "@/actions/categories.actions";
 import { Session } from "next-auth";
 import useCart from "@/hooks/use-cart";
 import useWishlist from "@/hooks/use-wishlist";
-const mobileNavItems = (profileId: string | null) => [
-    {
-        title: 'Shop',
-        href: '/'
-    },
-    {
+interface NavItem {
+    title: string
+    href: string
+    redirect?: boolean
+}
+const mobileNavItems = (profileId: string | null, isAdmin: boolean): NavItem[] => {
+    const baseArray = [
+        {
+            title: 'Shop',
+            href: '/'
+        }];
+    const customerArray = [{
         title: "WishList",
         href: '/dashboard/wishlist',
         redirect: profileId === null
@@ -29,7 +35,16 @@ const mobileNavItems = (profileId: string | null) => [
         href: `/dashboard`,
         redirect: profileId === null
     },
-]
+    ]
+    const adminArray = [
+        {
+            title: "Admin",
+            href: '/admin',
+            redirect: !isAdmin
+        }
+    ]
+    return [...baseArray, ...(isAdmin ? adminArray : customerArray)]
+}
 type NavbarProps = {
     session: Session | null
     categories: CategoryWithProducts[]
@@ -73,7 +88,8 @@ export default function Navbar({ session, categories }: NavbarProps) {
         setMobileNavOpen(val)
     }
     const isLoggedIn = session?.user !== undefined;
-    const navItems = mobileNavItems(session?.user?.id ?? null);
+    const isAdmin = session?.user?.role === 'ADMIN';
+    const navItems = mobileNavItems(session?.user?.id ?? null, isAdmin);
     return (
         <>
             <nav className="flex items-center border-b-[1.5px] border-b-disabled h-20 z-[900000] py-6 w-full px-3 sm:px-7 justify-between fixed top-0 bg-white lg:w-full  inset-x-0">
@@ -110,7 +126,7 @@ export default function Navbar({ session, categories }: NavbarProps) {
                         </ShoppingCart>
                         {cart.length > 0 && (<NotificationBadge value={cart.length} size={20} />)}
                     </Button>
-                    {isLoggedIn && (
+                    {(isLoggedIn && !isAdmin) && (
                         <>
                             <Button
                                 variant={'neutral'}
@@ -142,6 +158,22 @@ export default function Navbar({ session, categories }: NavbarProps) {
                             </Button>
                         </>
                     )}
+                    {
+                        isLoggedIn && isAdmin && (
+                            <Button
+                                variant={'neutral'}
+                                size='icon'
+                                className="hidden lg:flex"
+                                asChild
+                            >
+                                <Link href="/admin">
+                                    <UserCog2Icon aria-labelledby="admin">
+                                        <title id="admin">admin</title>
+                                    </UserCog2Icon>
+                                </Link>
+                            </Button>
+                        )
+                    }
                     <motion.div
                         whileTap={{ scale: 0.85 }}
                         className="lg:hidden flex flex-col justify-center cursor-pointer sm:ml-4 ml-1.5"

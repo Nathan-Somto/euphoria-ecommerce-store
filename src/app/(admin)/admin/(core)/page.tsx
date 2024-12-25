@@ -54,14 +54,14 @@ const productData = [{
   total: 15
 }, {
   name: "Flashy Hats",
-  total:10
+  total: 10
 }, {
-  name :"Sexy Hoodie",
+  name: "Sexy Hoodie",
   total: 4
 },
 {
   name: "Manly Sneakers",
-  total:12
+  total: 12
 }
 ]
 export default function AdminDashboardPage() {
@@ -78,7 +78,7 @@ export default function AdminDashboardPage() {
         ))}
       </div>
       <RevenueChart chartData={data} />
-      <ProductChart chartData={productData}/>
+      <ProductChart chartData={productData} />
     </div>
   );
 }

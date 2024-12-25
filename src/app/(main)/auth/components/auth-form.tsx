@@ -20,6 +20,7 @@ type Props<T extends ZodRawShape | {}, U extends Record<string, any>> = {
     belowBtnLink?: string
     belowBtnLinkText?: string
     showSubmitBtn?: boolean
+    customImage?: () => React.ReactNode
     customBelowBtn?: () => React.ReactNode
     actionFn?: (values: z.infer<z.ZodObject<T>>) => Promise<U>
     onSubmitCb?: (values: z.infer<z.ZodObject<T>>) => void;
@@ -37,6 +38,7 @@ export default function AuthForm<T extends ZodRawShape, U extends Record<string,
     belowBtnLinkText = "",
     showSubmitBtn = true,
     customBelowBtn: BelowBtn,
+    customImage: Image,
     className,
     onSubmitCb = () => void 0,
     actionFn = async (values: z.infer<z.ZodObject<T>>): Promise<U> => ({
@@ -72,6 +74,7 @@ export default function AuthForm<T extends ZodRawShape, U extends Record<string,
             <Form {...form}>
                 <form className='px-10 py-8' onSubmit={form.handleSubmit(onSubmit)}>
                     <div className='mb-5'>
+                        {Image && <Image />}
                         <h2 className='text-3xl text-[#333] font-semibold mb-2'>{heading}</h2>
                         <p className='text-[#666666]/80 font-medium text-sm'>{subTitle}</p>
                     </div>

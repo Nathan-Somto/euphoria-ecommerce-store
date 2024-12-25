@@ -143,7 +143,7 @@ export async function loginUser(
             const user = await getUserByEmail(credentials.email)
             if (!user.data || !user.data.password) throw new Error("Invalid email or password")
             const passwordMatch = await bycrypt.compare(credentials.password, user.data.password)
-            if (forAdmin && user.data.role !== 'ADMIN') throw new Error("Invalid email or password")
+            if (forAdmin && user.data.role !== 'ADMIN') throw new Error("You are not authorized to access this page")
             if (!passwordMatch) throw new Error("Invalid email or password")
             const res = await executeIfEnabled('EMAIL_VERIFICATION', async () => {
                 if (user.data) {
