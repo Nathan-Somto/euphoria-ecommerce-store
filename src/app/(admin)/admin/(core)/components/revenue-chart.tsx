@@ -1,4 +1,5 @@
 "use client";
+import { convertToCurrency } from "@/utils/convertToCurrency";
 import { formatter } from "@/utils/formatter";
 import {
   BarChart,
@@ -11,25 +12,26 @@ import {
   ResponsiveContainer,
 } from "recharts";
 export default function RevenueChart({ chartData }: RevenueChartProps) {
+  console.log("the chart data:", chartData);
   return (
     <ResponsiveContainer height={400} width={'100%'}>
-      <BarChart  data={chartData}>
+      <BarChart data={chartData}>
         <XAxis
           dataKey="name"
           stroke="#888888"
           fontSize={12}
-          tickLine={false}      
+          tickLine={false}
         />
-        <YAxis 
+        <YAxis
           stroke="#888888"
           fontSize={12}
           tickLine={false}
-          tickFormatter={(value) =>`₦${value}` }
+          tickFormatter={(value) => `${convertToCurrency(+value, '$', '₦')}`}
         />
-        <Tooltip formatter={(value) => `₦${formatter.format(+value).replace(/NGN/s, '')}`} />
+        <Tooltip formatter={(value) => `${convertToCurrency(+value, '$', '₦')}`} />
         <Legend />
         <Bar dataKey="total" fill="hsl(266,98%,60%)" radius={4} />
       </BarChart>
-    </ResponsiveContainer>  
+    </ResponsiveContainer>
   );
 }

@@ -1,6 +1,6 @@
 import { CreditCardIcon, DollarSignIcon, LucideIcon, Users, Package } from "lucide-react";
 
-const data:({title:string, Icon: LucideIcon, format: boolean})[] = [{
+const data: ({ title: string, Icon: LucideIcon, format: boolean })[] = [{
     title: "Total Revenue",
     Icon: DollarSignIcon,
     format: true
@@ -8,12 +8,12 @@ const data:({title:string, Icon: LucideIcon, format: boolean})[] = [{
 {
     title: "Total Sales",
     Icon: CreditCardIcon,
-    format: true
+    format: false
 },
 {
-    title :"Active Users",
+    title: "Active Users",
     Icon: Users,
-    format:false
+    format: false
 },
 {
     title: "Products in Stock",
