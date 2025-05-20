@@ -5,6 +5,9 @@ import useCart from '@/hooks/use-cart';
 import CustomDialog from '@/components/custom-dialog';
 import { Button } from '@/components/ui/button';
 import DeleteDialog from '@/components/delete-dialog';
+import { useCurrencyStore } from '@/hooks/use-currency';
+import { convertToCurrency } from '@/utils/convertToCurrency';
+import { DEFAULT_CURRENCY } from '@/constants';
 
 
 type CartTableRowProps = {
@@ -30,6 +33,7 @@ export function CartTableRow({ item }: CartTableRowProps) {
         removeFromCart(item.id);
         setOpen(false)
     }
+    const currency = useCurrencyStore(state => state.currency)
     return (
         <>
             <tr className='h-[120px] w-full min-w-[600px] mx-auto border-b border-muted-foreground'>
@@ -49,7 +53,11 @@ export function CartTableRow({ item }: CartTableRowProps) {
                         </p>
                     </div>
                 </td>
-                <td className='font-semibold text-primary-foreground text-lg p-2'>${item.price.toFixed(2)}</td>
+                <td className='font-semibold text-primary-foreground text-lg p-2'>
+                    {
+                        convertToCurrency(item.price, DEFAULT_CURRENCY, currency)
+                    }
+                </td>
                 <td className='p-2'>
                     <div className='bg-accent-foreground h-8 flex items-center rounded-[8px] max-w-20 justify-center px-2'>
                         <button
@@ -69,7 +77,7 @@ export function CartTableRow({ item }: CartTableRowProps) {
                         </button>
                     </div>
                 </td>
-                <td className='font-semibold text-primary-foreground text-lg p-2'>${(item.quantity * item.price).toFixed(2)}</td>
+                <td className='font-semibold text-primary-foreground text-lg p-2'>{convertToCurrency((item.quantity * item.price), DEFAULT_CURRENCY, currency)}</td>
                 <td className='p-2'>
                     <button onClick={onOpenDialog} className='text-destructive hover:opacity-50'><TrashIcon size={18} /></button>
                 </td>

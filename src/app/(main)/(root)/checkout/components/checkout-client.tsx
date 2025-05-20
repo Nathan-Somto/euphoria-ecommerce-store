@@ -17,6 +17,9 @@ import toast from "react-hot-toast";
 import { PaymentIntentConfirmParams } from "@stripe/stripe-js";
 import StripePaymentForm from "./stripe-payment-form";
 import { calculateTotal } from "@/utils/calculateTotal";
+import { convertToCurrency } from "@/utils/convertToCurrency";
+import { DEFAULT_CURRENCY } from "@/constants";
+import { useCurrencyStore } from "@/hooks/use-currency";
 type Props = {
     addresses: Address[]
 }
@@ -81,6 +84,7 @@ export default function CheckoutClient({ addresses }: Props) {
         }
     }
     const { actualTotal, shippingCost } = calculateTotal(cart);
+    const currency = useCurrencyStore(state => state.currency);
     return (
         <section id="checkout-page" className="max-w-screen-lg gap-x-12 pb-10 grid lg:grid-cols-[1fr_300px] mx-auto relative">
             <div className="w-[95%] max-w-screen-md mx-auto lg:px-3 lg:max-w-none lg:w-full pt-6">
@@ -113,14 +117,14 @@ export default function CheckoutClient({ addresses }: Props) {
                             </span>
                         </h4>
                         <p className="text-base font-medium">
-                            ${actualTotal.toFixed(2)}
+                            {convertToCurrency(actualTotal, DEFAULT_CURRENCY, currency)}
                         </p>
                     </div>
                     <div className="flex items-center justify-between mb-2">
                         <h4 className="text-sm font-medium">
                             Delivery
                         </h4>
-                        <p className="text-base font-medium">${shippingCost.toFixed(2)}</p>
+                        <p className="text-base font-medium">{convertToCurrency(shippingCost, DEFAULT_CURRENCY, currency)}</p>
                     </div>
                     <p>By clicking this button you agree to our{''}
                         <span className="text-primary underline inline-block mx-0.5">terms</span>
