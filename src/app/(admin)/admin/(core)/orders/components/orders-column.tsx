@@ -1,9 +1,11 @@
 import { ColumnDef } from "@tanstack/react-table";
-import { GetOrdersColumnsParams,  OrdersTable } from ".";
+import { GetOrdersColumnsParams, OrdersTable } from ".";
 import { format } from "date-fns";
 import CellAction from "./cell-action";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { convertToCurrency } from "@/utils/convertToCurrency";
+import { DEFAULT_CURRENCY } from "@/constants";
 export function getOrdersColumns({
   getTotalPrice,
   getOrderNumber,
@@ -36,7 +38,7 @@ export function getOrdersColumns({
       accessorKey: "user",
       header: "Customer",
       cell: ({ row }) => {
-        const {id, name} = row.original.user;
+        const { id, name } = row.original.user;
         return <Link href={`/admin/customers?id=${id}`}><span className="underline text-blue-600">{name}</span></Link>;
       },
     },
@@ -61,9 +63,9 @@ export function getOrdersColumns({
             className={cn(
               "capitalize rounded-sm px-1 text-black/70 text-xs",
               status === "pending" && "bg-yellow-500",
-                status === "delivered" && "bg-green-500",
-                status === "cancelled" && "bg-red-500",
-                status === "paid" && "bg-blue-500",
+              status === "delivered" && "bg-green-500",
+              status === "failed" && "bg-red-500",
+              status === "paid" && "bg-blue-500",
             )}
           >
             {row.original.status.toLowerCase()}
@@ -76,7 +78,7 @@ export function getOrdersColumns({
       header: "Total",
       cell: ({ row }) => {
         const total = getTotalPrice(row.original.products);
-        return <span className="">{total.toFixed(2)}</span>;
+        return <span className="">{`${convertToCurrency(total, DEFAULT_CURRENCY, '₦')}`}</span>;
       },
     },
     {
@@ -86,6 +88,7 @@ export function getOrdersColumns({
           <CellAction
             id={row.original.id}
             currentStatus={row.original.status}
+            products={row.original.products}
           />
         );
       },

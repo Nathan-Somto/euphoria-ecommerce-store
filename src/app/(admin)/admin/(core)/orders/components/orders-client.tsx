@@ -8,28 +8,28 @@ import { OrdersClientProps, OrdersProducts, OrdersTable } from ".";
 import { DataTable } from "@/components/ui/data-table";
 import { getOrdersColumns } from "./orders-column";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { calculateTotal } from "@/utils/calculateTotal";
+import { $Enums } from "@prisma/client";
+import { getOrderListData, getOrderTriggers, OrderTriggers } from "@/utils/ordersFilter";
 
-const tabList = [
-  { label: "All", value: "all" },
-  { label: "Paid", value: "paid" },
-  { label: "Pending", value: "pending" },
-  { label: "Delivered", value: "delivered" },
-  { label: "Cancelled", value: "cancelled" },
-];
-
+type Status = $Enums.Status;
 export default function OrdersClient({ data: {
   orders,
-  totalPages
+  totalPages,
 } }: OrdersClientProps) {
+  const [isDownloading, setIsDownloading] = React.useState(false);
+  const downloadRef = React.useRef<HTMLAnchorElement>(null);
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const [filterValue, setFilterValue] = React.useState("");
-  const [activeTab, setActiveTab] = React.useState("all");
+  const [activeTab, setActiveTab] = React.useState<OrderTriggers['value']>("ALL");
+  const [filteredData, setFilteredData] = React.useState<OrdersTable>([]);
   const page = searchParams.get('page') !== null ? +(searchParams.get('page') as string) : 1
   const handleSearchFilter = (value: string) => {
     setFilterValue(value);
   };
+  React.useEffect(() => { }, [])
   const createQueryString = React.useCallback(
     (name: string, value: string) => {
       const params = new URLSearchParams(searchParams.toString())
@@ -40,6 +40,30 @@ export default function OrdersClient({ data: {
     [searchParams]
   )
   const downloadAsCSV = () => {
+    if (!downloadRef.current) return
+    setIsDownloading(true);
+    // handle downloadAsCSV
+    const csv = orders.map((order) => {
+      return order.products.map((product) => {
+        return [
+          order.id,
+          order.user.name,
+          product.name,
+          product.quantity,
+          product.price,
+          product.discountRate,
+          order.status,
+          order.createdAt,
+        ].join(",");
+      });
+    });
+    const csvData = csv.join("\n");
+    const blob = new Blob([csvData], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    downloadRef.current.href = url;
+    downloadRef.current.download = `orders-${new Date().toISOString()}.csv`;
+    downloadRef.current.click();
+    setIsDownloading(false);
 
   };
   const handleNext = () => {
@@ -48,21 +72,21 @@ export default function OrdersClient({ data: {
   const handlePrevious = () => {
     router.push(pathname + createQueryString('page', (page - 1).toString()))
   }
-  const handleTabChange = (value: string) => {
+  const handleTabChange = (value: OrderTriggers['value']) => {
     setActiveTab(value);
+    const data = getOrderListData(orders, value);
+    setFilteredData(data as unknown as OrdersTable);
   };
   const getOrderNumber = (page: number, index: number) => {
     return page * (index + 1);
   }
-  const getTotalPrice = (products: OrdersProducts) => {
-    return products.reduce((acc, next) =>
-      acc + ((next?.price ?? 1) * next.quantity)
-      , 0)
-  }
+  const tabList = getOrderTriggers();
+  const getTotalPrice = (products: OrdersProducts) => calculateTotal(products).actualTotal
+  const getOrders = () => activeTab === 'ALL' ? orders : filteredData
   return (
     <div className="space-y-6">
       {/* Header Section */}
-      <div className="flex items-center justify-between">
+      <div className="md:flex space-y-3 md:space-y-0 items-center justify-between">
         <SearchBar
           onChange={handleSearchFilter}
           placeholder="Search for an order"
@@ -96,9 +120,9 @@ export default function OrdersClient({ data: {
         columns={getOrdersColumns({
           getOrderNumber,
           getTotalPrice,
-          page: 1
+          page
         })}
-        data={orders}
+        data={getOrders()}
       />
       <Pagination
         currentPage={page}
@@ -106,6 +130,7 @@ export default function OrdersClient({ data: {
         onNext={handleNext}
         onPrevious={handlePrevious}
       />
+      <a ref={downloadRef} className="hidden size-0" />
     </div>
   );
 }
