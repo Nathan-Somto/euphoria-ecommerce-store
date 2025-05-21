@@ -1,5 +1,12 @@
-import { Body, Html, Button, Text, Tailwind, Row, Column, Img, Container, Section, Link, Head } from '@react-email/components';
-
+import { Html } from '@react-email/html';
+import { Head } from '@react-email/head';
+import { Body } from '@react-email/body';
+import { Button } from '@react-email/button';
+import { Text } from '@react-email/text';
+import { Tailwind } from '@react-email/tailwind';
+import { Img } from '@react-email/img';
+import { Container } from '@react-email/container';
+import { Section } from '@react-email/section';
 type ResetPasswordProps = {
     name: string;
     resetLink: string;
@@ -47,16 +54,16 @@ function ResetPasswordEmail({ name, resetLink }: ResetPasswordProps) {
                         <Section className="text-center">
                             <Img src={`${baseURL}/static/Logo.png`} alt="Euphoria Logo" className="h-20 w-20 object-contain mx-auto mb-6" />
                             <Section className="relative overflow-hidden h-[350px] w-full">
-                            <Img src={`${baseURL}/static/reset-password.png`} className="h-[350px] w-full object-cover object-top rounded-md mx-auto" />
-                            <Section style={{
-                                background: 'linear-gradient(60deg, #7747ff, 7%, rgba(0, 0, 0, 0.5) 100%)'
-                                ,
-                            }} className="absolute h-full w-full  inset-0 grid place-items-center">
-                                
-                            <Text className="title-text max-w-[400px] !mx-auto w-full block text-4xl font-bold uppercase text-white/90 mb-4">
-                                Password Reset Request
-                            </Text>
-                            </Section>
+                                <Img src={`${baseURL}/static/reset-password.png`} className="h-[350px] w-full object-cover object-top rounded-md mx-auto" />
+                                <Section style={{
+                                    background: 'linear-gradient(60deg, #7747ff, 7%, rgba(0, 0, 0, 0.5) 100%)'
+                                    ,
+                                }} className="absolute h-full w-full  inset-0 grid place-items-center">
+
+                                    <Text className="title-text max-w-[400px] !mx-auto w-full block text-4xl font-bold uppercase text-white/90 mb-4">
+                                        Password Reset Request
+                                    </Text>
+                                </Section>
                             </Section>
                             <Text className="text-left text-text text-lg mb-6">
                                 Hi {name}, we received a request to reset your password. Click the button below to set up a new password:

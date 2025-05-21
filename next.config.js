@@ -10,6 +10,12 @@ const nextConfig = {
           },
         ],
       },
+      experimental: {
+        serverComponentsExternalPackages: ['@react-email/components']
+      },
+      compiler: {
+        removeConsole: process.env.NODE_ENV === 'production',
+      }
 }
 
 module.exports = nextConfig

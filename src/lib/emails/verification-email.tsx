@@ -1,5 +1,12 @@
-import { Body, Html, Button, Text, Tailwind, Img, Container, Section, Head } from '@react-email/components';
-//Todo: host images on cloduinary
+import { Html } from '@react-email/html';
+import { Head } from '@react-email/head';
+import { Body } from '@react-email/body';
+import { Button } from '@react-email/button';
+import { Text } from '@react-email/text';
+import { Tailwind } from '@react-email/tailwind';
+import { Img } from '@react-email/img';
+import { Container } from '@react-email/container';
+import { Section } from '@react-email/section';
 type VerificationEmailProps = {
     name: string;
     verifyLink: string;
@@ -8,7 +15,7 @@ type VerificationEmailProps = {
 
 function VerificationEmail({ name, verifyLink, token }: VerificationEmailProps) {
     const baseURL = process.env.SITE_URL ? process.env.SITE_URL : "";
-    console.log("baseUrl in comp: ",baseURL);
+    console.log("baseUrl in comp: ", baseURL);
     return (
         <Html>
             <Head>
