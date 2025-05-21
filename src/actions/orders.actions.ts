@@ -28,7 +28,9 @@ export async function getAdminOrders(page: number) {
                                 select: {
                                     name: true,
                                     price: true,
-                                    id: true
+                                    id: true,
+                                    discountRate: true,
+                                    images: true
                                 }
                             },
                             quantity: true
@@ -38,13 +40,14 @@ export async function getAdminOrders(page: number) {
                 skip: totalPages * page,
                 take: 10
             })
-            const formattedData = data.map(item => ({
+            const formattedData = data.map(({ orderedProducts, ...item }) => ({
                 ...item,
-                products: item.orderedProducts.map(item => ({
+                products: orderedProducts.map(item => ({
                     quantity: item.quantity,
-                    ...item.Product
+                    ...item.Product,
+                    price: item?.Product?.price ?? 1,
+                    discountRate: item?.Product?.discountRate ?? null,
                 })),
-                orderedProducts: undefined
             }))
             return {
                 orders: formattedData,
