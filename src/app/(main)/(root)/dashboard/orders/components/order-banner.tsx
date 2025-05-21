@@ -1,3 +1,6 @@
+import { DEFAULT_CURRENCY } from '@/constants'
+import { useCurrencyStore } from '@/hooks/use-currency'
+import { convertToCurrency } from '@/utils/convertToCurrency'
 import { formatDate } from 'date-fns'
 import React from 'react'
 interface Props {
@@ -7,6 +10,7 @@ interface Props {
     address: string
 }
 export default function OrderBanner({ orderNumber, createdAt, totalPrice, address }: Props) {
+    const currency = useCurrencyStore(state => state.currency);
     return (
         <div>
             <article className="flex  justify-between p-4 bg-neutral shadow-sm rounded-lg my-5">
@@ -21,7 +25,11 @@ export default function OrderBanner({ orderNumber, createdAt, totalPrice, addres
                     </p>
                 </div>
                 <p className='text-lg text-neutral-foreground self-center'>
-                    Total: <span className='text-primary-foreground'>${totalPrice}</span>
+                    Total: <span className='text-primary-foreground'>
+                        {
+                            convertToCurrency(totalPrice, DEFAULT_CURRENCY, currency)
+                        }
+                    </span>
                 </p>
             </article>
         </div>
