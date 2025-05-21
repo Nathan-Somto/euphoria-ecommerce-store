@@ -59,6 +59,7 @@ export default function ProductForm({
     isArchived: false,
     isFeatured: false,
     price: 35_000,
+    units: 1
   },
   categories,
   productId,
@@ -135,6 +136,19 @@ export default function ProductForm({
                 <FormLabel>Price</FormLabel>
                 <FormControl>
                   <FormInput placeholder="₦35,000" {...field} type="number" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="units"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Units <small>(Items in Stock)</small></FormLabel>
+                <FormControl>
+                  <FormInput placeholder="5" {...field} type="number" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -262,7 +276,7 @@ export default function ProductForm({
             control={form.control}
             name="description"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className="col-span-2">
                 <FormLabel>Description</FormLabel>
                 <FormControl>
                   <Textarea

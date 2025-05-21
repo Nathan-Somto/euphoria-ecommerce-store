@@ -23,7 +23,7 @@ export default function AdminLayout({
       <body className={`${open_sans.className}`}>
         <Sidebar isDesktop />
         <Header />
-        <main className="lg:ml-[270px] w-full min-h-screen px-4 lg:w-[calc(100%-270px)] mr-auto mt-[68px] bg-[#F3F4F8]">
+        <main className="lg:ml-[270px] min-h-screen w-full px-4 lg:w-[calc(100%-270px)] mr-auto mt-[68px] bg-[#F3F4F8]">
           {children}
         </main>
         <Toaster

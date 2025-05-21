@@ -199,7 +199,7 @@ export async function updateProduct(data: ProductSchema, productId: string) {
         categoryId: modifiedData.categoryId,
         size: modifiedData.size,
         images: modifiedData.images,
-        units: 5,
+        units: modifiedData.units,
         isArchived: modifiedData.isArchived,
         isFeatured: modifiedData.isFeatured,
       },

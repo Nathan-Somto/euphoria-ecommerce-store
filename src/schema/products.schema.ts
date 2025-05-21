@@ -12,7 +12,8 @@ const productSchema = z.object({
     sizes: z.array(z.object({
         label: z.string(),
         value: z.enum(["XS", "SM", "MD", "LG", "XL", "XXL"])
-    }))
+    })),
+    units: z.coerce.number().min(0),
 });
 type ProductSchema = z.infer<typeof productSchema>
 
