@@ -8,6 +8,7 @@ import { SignUpSchema } from '@/schema/auth.schema'
 import { generateUsername } from '@/utils/generateUsername'
 import { sendResetEmail, sendVerificationEmail } from '@/lib/resend'
 import { executeIfEnabled } from '@/flags'
+import { BadRequestError, InternalServerError, NotFoundError, UnauthorizedError } from '@/lib/errors'
 export async function getUserByEmail(email: string) {
     return await tryCatchFn({
         cb: async () => await prisma.user.findUnique({
@@ -95,7 +96,7 @@ export async function verifyEmail(email: string, token: string, callbackUrl: str
     return await tryCatchFn({
         cb: async () => {
             const user = await getUserByEmail(email)
-            if (user?.data === null || user?.data === undefined) throw new Error('user not found');
+            if (user?.data === null || user?.data === undefined) throw new BadRequestError('user not found');
             const userId = user.data.id
             const verificationToken = await prisma.verificationToken.findFirst({
                 where: {
@@ -103,8 +104,8 @@ export async function verifyEmail(email: string, token: string, callbackUrl: str
                     token
                 }
             })
-            if (!verificationToken) throw new Error("Invalid verification token")
-            if (verificationToken.expiresAt < new Date()) throw new Error("Verification token expired")
+            if (!verificationToken) throw new BadRequestError("Invalid verification token")
+            if (verificationToken.expiresAt < new Date()) throw new BadRequestError("Verification token expired")
             await prisma.user.update({
                 where: {
                     id: userId
@@ -141,25 +142,25 @@ export async function loginUser(
     return await tryCatchFn({
         cb: async () => {
             const user = await getUserByEmail(credentials.email)
-            if (!user.data || !user.data.password) throw new Error("Invalid email or password")
+            if (!user.data || !user.data.password) throw new BadRequestError("Invalid email or password")
             const passwordMatch = await bycrypt.compare(credentials.password, user.data.password)
-            if (forAdmin && user.data.role !== 'ADMIN') throw new Error("You are not authorized to access this page")
-            if (!passwordMatch) throw new Error("Invalid email or password")
+            if (forAdmin && user.data.role !== 'ADMIN') throw new UnauthorizedError("You are not authorized to access this page")
+            if (!passwordMatch) throw new BadRequestError("Invalid email or password")
             const res = await executeIfEnabled('EMAIL_VERIFICATION', async () => {
                 if (user.data) {
                     if (!user.data.isEmailVerified) {
                         const { data } = await generateToken(user.data.id, 'verification');
-                        if (!data?.token) throw new Error('Error generating verification token')
+                        if (!data?.token) throw new InternalServerError('Error generating verification token')
                         const verifyLink = `${process.env.SITE_URL}/auth/verify-email?email=${user.data.email}`;
                         const { data: verifyEmailRes } = await sendVerificationEmail(user.data.email, user.data.name, data.token, verifyLink);
-                        if (!verifyEmailRes) throw new Error('Something went wrong sending verification email')
+                        if (!verifyEmailRes) throw new InternalServerError('Something went wrong sending verification email')
                         return {
                             message: "Verification email sent"
                         }
                     }
                 }
                 else {
-                    throw new Error("Invalid email or password")
+                    throw new BadRequestError("Invalid email or password")
                 }
             })
             if (res) return res
@@ -180,14 +181,15 @@ export async function loginUser(
         },
         message: "Error logging in user",
         returnErrorMessage: true,
-        throwRedirectError: true
+        throwRedirectError: true,
+        throwError: true
     })
 }
 export async function registerUser(values: SignUpSchema, redirectTo = '/') {
     return await tryCatchFn({
         cb: async () => {
             const user = await getUserByEmail(values.email)
-            if (user.data) throw new Error("User already exists")
+            if (user.data) throw new BadRequestError("User already exists")
             const hashedPassword = await bycrypt.hash(values.password, 10)
             const res = await prisma.user.create({
                 data: {
@@ -200,10 +202,10 @@ export async function registerUser(values: SignUpSchema, redirectTo = '/') {
             })
             const executeRes = await executeIfEnabled('EMAIL_VERIFICATION', async () => {
                 const { data } = await generateToken(res.id, 'verification');
-                if (!data?.token) throw new Error('Error generating verification token');
+                if (!data?.token) throw new InternalServerError('Error generating verification token');
                 const verifyLink = `${process.env.SITE_URL}/auth/verify-email?email=${res.email}`;
                 const { data: verifyEmailRes } = await sendVerificationEmail(res.email, res.name, data.token, verifyLink);
-                if (!verifyEmailRes) throw new Error('Something went wrong sending verification email')
+                if (!verifyEmailRes) throw new InternalServerError('Something went wrong sending verification email')
                 return true // that is the feature is working
             })
             if (!executeRes) {
@@ -233,12 +235,12 @@ export async function resetPassword(email: string) {
     return await tryCatchFn({
         cb: async () => {
             const user = await getUserByEmail(email)
-            if (!user.data) throw new Error("User not found")
+            if (!user.data) throw new NotFoundError("User not found")
             const { data } = await generateToken(user.data.id, 'passwordReset');
-            if (!data?.token) throw new Error('Error generating password reset token')
+            if (!data?.token) throw new InternalServerError('Error generating password reset token')
             const resetLink = `${process.env.SITE_URL}/auth/new-password/${data?.token}/?email=${user.data.email}`;
             const { data: resetEmailRes } = await sendResetEmail(user.data.email, user.data.name, resetLink);
-            if (!resetEmailRes) throw new Error('Something went wrong sending password reset email')
+            if (!resetEmailRes) throw new InternalServerError('Something went wrong sending password reset email')
             return {
                 message: "Password reset email sent"
             }
@@ -251,18 +253,18 @@ export async function updatePassword(email: string, token: string, password: str
     return await tryCatchFn({
         cb: async () => {
             const user = await getUserByEmail(email)
-            if (!user.data?.password) throw new Error("User not found")
+            if (!user.data?.password) throw new NotFoundError("User not found")
             const userId = user.data.id
             const passwordMatch = await bycrypt.compare(password, user.data?.password);
-            if (passwordMatch) throw Error("New Password is the same as old")
+            if (passwordMatch) throw new BadRequestError("New Password is the same as old")
             const passwordResetToken = await prisma.passwordResetToken.findFirst({
                 where: {
                     userId,
                     token
                 }
             })
-            if (!passwordResetToken) throw new Error("Invalid password reset token")
-            if (passwordResetToken.expiresAt < new Date()) throw new Error("Password reset token expired")
+            if (!passwordResetToken) throw new BadRequestError("Invalid password reset token")
+            if (passwordResetToken.expiresAt < new Date()) throw new BadRequestError("Password reset token expired")
             const hashedPassword = await bycrypt.hash(password, 10)
             await prisma.user.update({
                 where: {

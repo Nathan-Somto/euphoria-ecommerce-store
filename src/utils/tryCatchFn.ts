@@ -5,17 +5,22 @@ type Props<T> = {
     cb: () => Promise<T>;
     returnErrorMessage?: boolean
     throwRedirectError?: boolean
+    throwError?: boolean
 }
 export async function tryCatchFn<T>({
     returnErrorMessage = false,
     message = "function failed to execute",
     throwRedirectError = false,
+    throwError = false,
     cb
 }: Props<T>) {
     try {
         return { data: await cb() };
     } catch (e) {
         errorLogger(e);
+        if (throwError) {
+            throw e;
+        }
         if (throwRedirectError) {
             if (e instanceof AuthError) {
                 return {
