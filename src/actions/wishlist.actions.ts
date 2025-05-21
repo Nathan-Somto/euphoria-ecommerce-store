@@ -57,7 +57,8 @@ const getWishlistProducts = async () => {
                     name: true,
                     units: true,
                     price: true,
-                    size: true
+                    size: true,
+                    discountRate: true
                 }
             });
             const normalizedData = wishlistProducts.map(product => ({
