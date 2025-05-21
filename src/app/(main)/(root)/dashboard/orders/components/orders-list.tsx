@@ -7,39 +7,19 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import React from 'react'
 import OrderCard from './order-card';
 import EmptyOrderState from './empty-order-state';
+import { getOrderListData, getOrderTriggers } from '@/utils/ordersFilter';
+type OrderData = ServerActionReturnType<typeof getCustomersOrders>['orders'][number]
 interface Props {
     data: ServerActionReturnType<typeof getCustomersOrders>['orders']
     totalPages: number
     page: number
 }
-interface Triggers {
-    label: Capitalize<string>
-    value: $Enums.Status | 'ALL'
-}
-const triggers: Triggers[] = [
-    {
-        label: 'All',
-        value: 'ALL'
-    },
-    {
-        label: 'Paid',
-        value: 'PAID'
-    }, {
-        label: 'Delivered',
-        value: 'DELIVERED'
-    }, {
-        label: 'Failed',
-        value: 'FAILED'
-    }
-]
+
 export default function OrdersList({ data, totalPages, page }: Props) {
     /* Delivered time is set by the admin */
     const searchParams = useSearchParams();
     const router = useRouter();
-    const getListData = (status: Triggers['value']) => {
-        if (status === 'ALL') return data;
-        return data.filter(order => order.status === status)
-    }
+
     const queryHelper = (key: string, value: string) => {
         const params = new URLSearchParams(searchParams.toString());
         params.set(key, String(value));
@@ -53,10 +33,11 @@ export default function OrdersList({ data, totalPages, page }: Props) {
         //update the query params
         queryHelper('page', `${page - 1}`)
     }
-    const ALL = getListData('ALL');
-    const PAID = getListData('PAID');
-    const DELIVERED = getListData('DELIVERED');
-    const FAILED = getListData('FAILED');
+    const ALL = getOrderListData(data, 'ALL');
+    const PAID = getOrderListData(data, 'PAID');
+    const DELIVERED = getOrderListData(data, 'DELIVERED');
+    const FAILED = getOrderListData(data, 'FAILED');
+    const triggers = getOrderTriggers(['PENDING']);
     return (
         <div>
             <Tabs defaultValue='ALL' >
@@ -79,7 +60,7 @@ export default function OrdersList({ data, totalPages, page }: Props) {
                         )
                     }
                     {ALL.map(order => (
-                        <OrderCard key={order.id} data={order} />
+                        <OrderCard key={order.id} data={order as OrderData} />
                     ))}
                 </TabsContent>
                 <TabsContent value="PAID" className='space-y-4'>
@@ -89,7 +70,7 @@ export default function OrdersList({ data, totalPages, page }: Props) {
                         )
                     }
                     {PAID.map(order => (
-                        <OrderCard key={order.id} data={order} />
+                        <OrderCard key={order.id} data={order as OrderData} />
                     ))}
                 </TabsContent>
                 <TabsContent value="DELIVERED" className='space-y-4'>
@@ -99,7 +80,7 @@ export default function OrdersList({ data, totalPages, page }: Props) {
                         )
                     }
                     {DELIVERED.map(order => (
-                        <OrderCard key={order.id} data={order} />
+                        <OrderCard key={order.id} data={order as OrderData} />
                     ))}
                 </TabsContent>
                 <TabsContent value="FAILED" className='space-y-4'>
@@ -109,7 +90,7 @@ export default function OrdersList({ data, totalPages, page }: Props) {
                         )
                     }
                     {FAILED.map(order => (
-                        <OrderCard key={order.id} data={order} />
+                        <OrderCard key={order.id} data={order as OrderData} />
                     ))}
                 </TabsContent>
             </Tabs>

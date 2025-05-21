@@ -2,6 +2,8 @@ import { authConfig } from "@/lib/next-auth"
 import NextAuth from "next-auth"
 import { NextResponse as Response } from "next/server"
 import { adminRoute, disabledUserRoutes, privateRoutes, publicRoutes, RouteTest } from "./routes"
+import { getCountryCode } from "./utils/getCountryCode"
+import { setCountryCookie } from "./utils/setCountryCookie"
 // key things to note:
 // block users who are not signed in from accessing private routes
 // when i access a private route, i should be redirected to the sign in page the route i tried to access
@@ -10,33 +12,45 @@ import { adminRoute, disabledUserRoutes, privateRoutes, publicRoutes, RouteTest 
 // if i am already signed in, i should not be able to access auth pages
 // if i am logged in as a customer i should not be able to access any admin page or route even sign-in.
 const { auth } = NextAuth(authConfig)
-export default auth((req) => {
+export default auth(async (req) => {
     const isLoggedIn = !!req.auth
     const url = req.nextUrl;
     const { isRoute: isPublicRoute } = RouteTest(publicRoutes, url.pathname);
     const isAdminRoute = url.pathname.startsWith(adminRoute);
     const isAuthRoute = url.pathname.startsWith('/auth');
     let callbackUrl = `${url.pathname}${url.search}`;
+    let countryCode = req.cookies.get('x-country-code')?.value;
+    if (countryCode === undefined) {
+        countryCode = await getCountryCode(req);
+    }
     const encodedCallbackUrl = encodeURIComponent(callbackUrl)
     const isRedirecting = url.searchParams.has("blockedRoute")
+    console.log("the country code is", countryCode);
     if (!isRedirecting) {
         if (isAdminRoute && !isLoggedIn) {
-            return Response.redirect(new URL(`/admin/sign-in?blockedRoute=${encodedCallbackUrl}`, url))
+            return setCountryCookie(
+                Response.redirect(new URL(`/admin/sign-in?blockedRoute=${encodedCallbackUrl}`, url)),
+                countryCode
+            );
         }
         if (!isLoggedIn && !isPublicRoute) {
-            return Response.redirect(new URL(`/auth/login?blockedRoute=${encodedCallbackUrl}`, url))
+            return setCountryCookie(
+                Response.redirect(new URL(`/auth/login?blockedRoute=${encodedCallbackUrl}`, url)),
+                countryCode
+            );
         }
         if (isAuthRoute && isLoggedIn) {
-            return Response.redirect(new URL('/', url))
+            return setCountryCookie(Response.redirect(new URL("/", url)), countryCode);
         }
     }
     const requestHeaders = new Headers(req.headers);
     requestHeaders.set('x-pathname', url.pathname);
-    return Response.next({
+    const response = Response.next({
         request: {
             headers: requestHeaders
         }
     })
+    return setCountryCookie(response, countryCode);
 })
 export const config = {
     matcher: ["/((?!.+\\.[\\w]+$|_next).*)", "/", "/(api|trpc)(.*)"],

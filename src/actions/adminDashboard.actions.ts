@@ -1,163 +1,159 @@
 "use server";
 import prisma from "@/lib/prisma";
-import { errorLogger } from "@/utils/errorLogger";
-
-export async function getRevenueChartData() {
-  try {
-    const revenueData = [
-      {
-        name: "January",
-        total: 0,
-      },
-      {
-        name: "Feburary",
-        total: 0,
-      },
-      {
-        name: "March",
-        total: 0,
-      },
-      {
-        name: "April",
-        total: 0,
-      },
-      {
-        name: "June",
-        total: 0,
-      },
-      {
-        name: "July",
-        total: 0,
-      },
-      {
-        name: "August",
-        total: 0,
-      },
-      {
-        name: "September",
-        total: 0,
-      },
-      {
-        name: "October",
-        total: 0,
-      },
-      {
-        name: "November",
-        total: 0,
-      },
-      {
-        name: "December",
-        total: 0,
-      },
-    ];
-    const orders = await prisma?.order.findMany({
-      where: {
-        OR: [{ status: "DELIVERED" }, { status: "PAID" }],
-      },
-      select: {
-        status: true,
-        createdAt: true,
-        products: {
-          select: {
-            price: true,
-          },
-        },
-      },
-    });
-    orders.forEach((order) => {
-      revenueData[order.createdAt.getMonth()].total += order.products.reduce(
-        (acc, next) => acc + next.price,
-        0
-      );
-    });
-    return revenueData;
-  } catch (err) {
-    errorLogger(err);
-    return [];
-  }
-}
-
-export async function getTotalRevenueAndSales(){
-    try{
-        
-        // Total Revenue
-        const orders =  await prisma?.order.findMany({
-            where: {
-              OR: [{ status: "DELIVERED" }, { status: "PAID" }],
-            },
-            select: {
-              status: true,
-              createdAt: true,
-              products: {
-                select: {
-                  price: true,
-                },
-              },
-            },
-          });
-          let totalRevenue = 0
-          orders.forEach((order) => {
-            totalRevenue += order.products.reduce(
-              (acc, next) => acc + next.price,
-              0
-            );
-          });
-          return [totalRevenue, orders.length]
-    }catch(err){
-        return [0,0];
-    }
-}
-/* export async function getProductChartData() {
-  try {
-    const productData = []
-    // get at most 10 orders
-    const orders = await prisma?.order.findMany({
-      where: {
-        OR: [{ status: "DELIVERED" }, { status: "SHIPPED" }],
-      },
-      select: {
-        status: true,
-        createdAt: true,
-        products: {
-          select: {
-            price: true,
-            units: true
-          },
-        },
-      },
-    });
-    // extract the products from each order
-    // increment the quantity for a product
-  }
-  catch(err){
-
-  }
-} */
-export async function getActiveUsers(){
-    try{
-        const activeUsers = await prisma.user.count({
-            where: {
-                isDisabled: false,
-                isEmailVerified: true,
-                role: "CUSTOMER",
-            }
-        });
-        return activeUsers;
-    }
-    catch(err){
-        return 0;
-    }
-}
-export async function getProductsInStock(){
-try{
-    const productsInStock = await prisma.product.count({
+import { generateRandomColor } from "@/utils/generateRandomColor";
+import { tryCatchFn } from "@/utils/tryCatchFn";
+export const getRevenueData = async () => {
+  return tryCatchFn({
+    cb: async () => {
+      const orders = await prisma?.order.findMany({
         where: {
-            inStock: true
+          OR: [{ status: "DELIVERED" }, { status: "PAID" }],
+        },
+        select: {
+          status: true,
+          createdAt: true,
+          orderedProducts: {
+            select: {
+              quantity: true,
+              Product: {
+                select: {
+                  price: true
+                }
+              }
+
+            }
+          }
+        },
+      });
+      return orders;
+    },
+    message: "Error fetching total orders",
+  });
+};
+export const getRevenueChartData = (data: ServerActionReturnType<typeof getRevenueData>) => {
+  const revenueData = [
+    {
+      name: "January",
+      total: 0,
+    },
+    {
+      name: "Feburary",
+      total: 0,
+    },
+    {
+      name: "March",
+      total: 0,
+    },
+    {
+      name: "April",
+      total: 0,
+    },
+    {
+      name: "May",
+      total: 0,
+    },
+    {
+      name: "June",
+      total: 0,
+    },
+    {
+      name: "July",
+      total: 0,
+    },
+    {
+      name: "August",
+      total: 0,
+    },
+    {
+      name: "September",
+      total: 0,
+    },
+    {
+      name: "October",
+      total: 0,
+    },
+    {
+      name: "November",
+      total: 0,
+    },
+    {
+      name: "December",
+      total: 0,
+    },
+  ];
+
+  data.forEach((order) => {
+    const month = new Date(order.createdAt).getMonth();
+    if (revenueData[month] === undefined) return;
+    revenueData[month].total += order.orderedProducts.reduce(
+      (acc, next) => acc + (next?.Product?.price ?? 1) * next.quantity,
+      0
+    );
+  });
+  return revenueData;
+};
+
+export const getOrdersAndRevenue = (data: ServerActionReturnType<typeof getRevenueData>) => {
+  let totalRevenue = 0
+  data.forEach((order) => {
+    totalRevenue += order.orderedProducts.reduce(
+      (acc, next) => acc + (next?.Product?.price ?? 1) * next.quantity,
+      0
+    );
+  })
+  return { totalRevenue, totalOrders: data.length }
+};
+
+
+export const getActiveUsers = async () => {
+  return tryCatchFn({
+    cb: async () => {
+      const activeUsers = await prisma.user.count({
+        where: {
+          isDisabled: false,
+          role: "CUSTOMER",
+        },
+      });
+      return activeUsers;
+    },
+    message: "Error fetching active users",
+  });
+};
+export const getProductsInStock = async () => {
+  return tryCatchFn({
+    cb: async () => {
+      const productsInStock = await prisma.product.count({
+        where: {
+          inStock: true,
+        },
+      });
+      return productsInStock;
+    },
+    message: "Error fetching products in stock",
+  })
+}
+export const getProductPurchaseData = async () => {
+  return tryCatchFn({
+    cb: async () => {
+      const products = await prisma.product.findMany({
+        select: {
+          name: true,
+          OrderedProduct: {
+            select: {
+              id: true
+            }
+          }
         }
-    });
-    return productsInStock;
-}
-catch(err){
-    return 0;
-}
+      });
+      // should be in this form [{name: "White Shirt", total: 15, color: "#FFC107"}]
+      return products.map((product) => {
+        return {
+          name: product.name,
+          total: product.OrderedProduct.length,
+          color: generateRandomColor()
+        }
+      });
+    },
+    message: "Error fetching product purchase data"
+  })
 }

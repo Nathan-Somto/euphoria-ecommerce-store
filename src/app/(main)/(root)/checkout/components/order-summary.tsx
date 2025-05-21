@@ -1,11 +1,14 @@
+import { DEFAULT_CURRENCY } from '@/constants';
 import useCart from '@/hooks/use-cart';
+import { useCurrencyStore } from '@/hooks/use-currency';
+import { convertToCurrency } from '@/utils/convertToCurrency';
 import { pluralize } from '@/utils/pluralize';
 import Image from 'next/image';
 import React from 'react';
 
 export default function OrderSummary() {
     const cart = useCart((state) => state.cart);
-
+    const currency = useCurrencyStore((state) => state.currency);
     return (
         <div className="w-full  lg:h-[250px] lg:overflow-y-auto">
             {/* Header */}
@@ -41,7 +44,7 @@ export default function OrderSummary() {
                             </p>
                         </div>
                         <p className="text-base font-medium text-right opacity-80">
-                            ${Math.ceil(item.quantity * item.price)}
+                            {convertToCurrency(Math.ceil(item.quantity * item.price), DEFAULT_CURRENCY, currency)}
                         </p>
                     </div>
                 ))}

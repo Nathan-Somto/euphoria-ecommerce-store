@@ -15,12 +15,15 @@ import DeleteDialog from '@/components/delete-dialog';
 import { useSession } from 'next-auth/react';
 import AuthDialog from '../../auth/components/auth-dialog';
 import { calculateTotal } from '@/utils/calculateTotal';
+import { useCurrencyStore } from '@/hooks/use-currency';
+import { convertToCurrency } from '@/utils/convertToCurrency';
+import { DEFAULT_CURRENCY } from '@/constants';
 type InvoiceParams = Record<string, number>;
 const getInvoiceData = ({ subTotal, shippingPrice, total, discountRate, originalTotal }: InvoiceParams) => {
     return [
         {
             label: 'Original Total',
-            value: originalTotal.toFixed(2)
+            value: +originalTotal.toFixed(2)
         },
         {
             label: 'Discount rate',
@@ -28,15 +31,15 @@ const getInvoiceData = ({ subTotal, shippingPrice, total, discountRate, original
         },
         {
             label: 'Sub Total',
-            value: subTotal.toFixed(2)
+            value: +subTotal.toFixed(2)
         },
         {
             label: 'Shipping',
-            value: shippingPrice.toFixed(2)
+            value: +shippingPrice.toFixed(2)
         },
         {
             label: 'Total',
-            value: total.toFixed(2)
+            value: +total.toFixed(2)
         }
     ]
 }
@@ -60,6 +63,7 @@ export default function CartPage() {
     React.useEffect(() => {
         setIsMounted(true);
     }, []);
+    const currency = useCurrencyStore(state => state.currency)
     return (
         <div className={cn('min-h-screen', cart.length > 0 && 'pt-12')}>
             {!isMounted ?
@@ -139,13 +143,13 @@ export default function CartPage() {
                                         invoiceData.slice(0, -1).map((item, index) => (
                                             <div key={index} className='flex justify-between items-center font-normal text-primary-foreground'>
                                                 <h4 className='text-lg !font-normal'>{item.label}</h4>
-                                                <p className=' tex-sm'>{item.value}</p>
+                                                <p className=' tex-sm'>{typeof item.value === 'number' ? convertToCurrency(item.value, DEFAULT_CURRENCY, currency) : item.value}</p>
                                             </div>
                                         ))
                                     }
                                     <div className='flex justify-between mt-4  text-primary-foreground pb-8 items-center'>
                                         <h4 className='text-xl font-semibold'>Total</h4>
-                                        <p className='opacity-80 font-medium text-[17.5px]'>${invoiceData.at(-1)?.value}</p>
+                                        <p className='opacity-80 font-medium text-[17.5px]'>{convertToCurrency(invoiceData.at(-1)?.value as number ?? 0, DEFAULT_CURRENCY, currency)}</p>
                                     </div>
                                 </div>
                                 <Button

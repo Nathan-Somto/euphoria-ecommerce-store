@@ -6,10 +6,11 @@ import { causten } from "@/constants/fonts"
 import { currentSession } from '@/lib/next-auth'
 import { cachedGetCategories } from '@/actions/categories.actions'
 import { Toaster } from "react-hot-toast"
-import { headers } from 'next/headers'
+import { cookies, headers } from 'next/headers'
 import { getCachedWishlistProductIds } from '@/actions/wishlist.actions'
 import { WishlistProvider } from '@/providers/wishlist-provider'
 import { SessionProvider } from 'next-auth/react'
+import CurrencyProvider from '@/providers/currency-provider'
 export const metadata: Metadata = {
   title: 'Euphoria Store',
   description: '',
@@ -36,13 +37,15 @@ export default async function RootLayout({
       <body className={causten.className}>
         <Navbar session={session} categories={categories ?? []} />
         <SessionProvider session={session}>
-          <WishlistProvider data={{
-            wishlistProductIds: wishlistProductIds ?? {}
-          }}>
-            <main className='mt-20'>
-              {children}
-            </main>
-          </WishlistProvider>
+          <CurrencyProvider>
+            <WishlistProvider data={{
+              wishlistProductIds: wishlistProductIds ?? {}
+            }}>
+              <main className='mt-20'>
+                {children}
+              </main>
+            </WishlistProvider>
+          </CurrencyProvider>
         </SessionProvider>
         {dontShowFooter && <Footer />}
         <Toaster position='bottom-right' />

@@ -15,6 +15,9 @@ import { useisInCart } from '@/hooks/use-in-cart'
 import useCart from '@/hooks/use-cart'
 import { $Enums } from '@prisma/client'
 import toast from 'react-hot-toast'
+import { convertToCurrency } from '@/utils/convertToCurrency'
+import { DEFAULT_CURRENCY } from '@/constants'
+import { useCurrencyStore } from '@/hooks/use-currency'
 type Props = {
     data: ServerActionReturnType<typeof getProduct>
 }
@@ -93,6 +96,7 @@ function ProductInfoClient({ data }: Props) {
     }
     const images = data.images.map((image, index) => ({ src: image, alt: `${data.name} image ${index + 1} ` }));
     const isInStock = data.units - getQuantity() > 0;
+    const currency = useCurrencyStore(state => state.currency)
     return (
         <>
             <section className='grid lg:grid-cols-2 mb-5 px-12 lg:gap-x-16 max-w-screen-xl mx-auto lg:min-h-screen w-full '>
@@ -237,8 +241,8 @@ function ProductInfoClient({ data }: Props) {
                                 <LucideShoppingCart className='mr-2 size-4' />
                                 {!isInStock ? 'Out of Stock' : isInCart ? 'Added to Cart' : 'Add to Cart'}
                             </Button>
-                            <Button variant={'outline'} className='min-w-[138px] h-[46px]' >${
-                                (data.price * getQuantity()).toFixed(2)
+                            <Button variant={'outline'} className='min-w-[138px] h-[46px]' >{
+                                convertToCurrency((data.price * getQuantity()), DEFAULT_CURRENCY, currency)
                             }</Button>
                         </div>
                         <div className='flex items-center gap-x-3'>

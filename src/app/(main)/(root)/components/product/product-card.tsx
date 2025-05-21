@@ -18,6 +18,8 @@ import { HeartFillIcon } from "./icons/heart-fill-icon";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { toggleWishlist } from "@/actions/wishlist.actions";
+import { useCurrencyStore } from "@/hooks/use-currency";
+import { DEFAULT_CURRENCY } from "@/constants";
 
 type ProductCardProps = {
     id: string,
@@ -44,7 +46,6 @@ export default function ProductCard({
     sizes,
     unitsInStock
 }: ProductCardProps) {
-    //TODO: implement zustand store for currency conversion
     const [isPending, startTransition] = React.useTransition();
     const { data } = useSession();
     const wishListProductIds = useWishlist(state => state.wishlistProductIds);
@@ -54,8 +55,7 @@ export default function ProductCard({
     const [openMustLogin, setOpenMustLogin] = React.useState(false);
     const isInCart = useisInCart(id);
     const isInStock = unitsInStock > 0;
-    const rate = 486;
-    const currency: '₦' | '$' = '$';
+    const currency = useCurrencyStore(state => state.currency);
     React.useEffect(() => {
         setIsInWishList(wishListProductIds[id] === true);
     }, [wishListProductIds]);
@@ -155,7 +155,7 @@ export default function ProductCard({
                     <div className="flex justify-between items-center mt-2">
                         <h3 className="text-[#2A2F2F] font-bold lg:text-lg text-[16.5px] truncate">{name}</h3>
                         <p className="text-primary-foreground bg-[#F6F6F6] px-2 rounded-md py-1 text-sm lg:text-base">
-                            {convertToCurrency(price, currency, rate)}
+                            {convertToCurrency(price, DEFAULT_CURRENCY, currency)}
                         </p>
                     </div>
                     <p className="text-sm text-neutral-foreground font-medium mb-1">{category}</p>

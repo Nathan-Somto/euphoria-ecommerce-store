@@ -33,7 +33,7 @@ export const providers: Provider[] = [
             if (!user || !user?.data?.password) return null
             const passwordMatch = await bycrypt.compare(password, user.data.password)
             // check if the request is coming from the admin site auth page
-            if (request.url.includes("/admin/auth") && user?.data?.role !== "ADMIN") return null
+            if (request.url.includes("/admin/sign-in") && user?.data?.role !== "ADMIN") return null
             if (!passwordMatch) return null
             return {
                 id: user.data.id,

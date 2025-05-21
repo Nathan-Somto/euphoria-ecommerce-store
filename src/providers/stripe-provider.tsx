@@ -2,8 +2,10 @@
 import { CartItem } from '@/app/(main)/(root)/cart/components'
 import { Button } from '@/components/ui/button'
 import Loader from '@/components/ui/loader'
-import { CART_STORAGE_KEY } from '@/constants'
+import { CART_STORAGE_KEY, DEFAULT_CURRENCY } from '@/constants'
+import { useCurrencyStore } from '@/hooks/use-currency'
 import { IntentSchema } from '@/schema/intent.schema'
+import { convertToCurrency } from '@/utils/convertToCurrency'
 import { errorLogger } from '@/utils/errorLogger'
 import { Elements } from '@stripe/react-stripe-js'
 import { loadStripe, type Stripe } from '@stripe/stripe-js'
@@ -33,10 +35,13 @@ export default function StripeProvider({ children, pk, userId }: Props) {
     const [stripe, setStripe] = React.useState<Stripe | null>(null)
     const [clientSecret, setClientSecret] = React.useState<string | null>(null)
     const [error, setError] = React.useState(false)
+    const currency = useCurrencyStore(state => state.currency);
+    const initialized = useCurrencyStore(state => state.initialized);
     const hasRun = React.useRef(false)
     React.useEffect(() => {
         if (hasRun.current) return;
         hasRun.current = true;
+        if (!initialized) return;
         const createPaymentIntent = async () => {
             if (!isLoading) return;
             try {
@@ -61,14 +66,14 @@ export default function StripeProvider({ children, pk, userId }: Props) {
                     items: itemsInCart
                         .map(item =>
                         ({
-                            price: item.price,
+                            price: convertToCurrency(item.price, DEFAULT_CURRENCY, currency, false) as number,
                             quantity: item.quantity,
                             productId: item.id,
                             discountRate: item.discountRate,
                             color: item.color,
                             size: item.size
                         })),
-                    currency: 'usd',
+                    currency: currency === '₦' ? 'ngn' : 'usd',
                     userId
                 }
                 const body = JSON.stringify(reqBody)
@@ -91,7 +96,7 @@ export default function StripeProvider({ children, pk, userId }: Props) {
             }
         }
         createPaymentIntent()
-    }, []);
+    }, [initialized]);
     if (isLoading || error) {
         return <div className='h-screen w-full bg-background grid place-items-center'>
             {error ?

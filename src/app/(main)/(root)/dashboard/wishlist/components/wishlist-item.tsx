@@ -1,7 +1,10 @@
 import { getWishlistProducts } from '@/actions/wishlist.actions';
 import { Button } from '@/components/ui/button';
+import { DEFAULT_CURRENCY } from '@/constants';
 import useCart from '@/hooks/use-cart';
+import { useCurrencyStore } from '@/hooks/use-currency';
 import { useisInCart } from '@/hooks/use-in-cart';
+import { convertToCurrency } from '@/utils/convertToCurrency';
 import { ShoppingCartIcon, XIcon } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -16,6 +19,7 @@ export default function WishlistItem({ product, openConfirmation }: WishlistItem
     const router = useRouter();
     const addToCart = useCart(state => state.addToCart);
     const isInCart = useisInCart(product.id);
+    const currency = useCurrencyStore(state => state.currency);
     const onAddToCart = () => {
         console.log('add to cart')
         addToCart({
@@ -27,7 +31,8 @@ export default function WishlistItem({ product, openConfirmation }: WishlistItem
             quantity: 1,
             size: product.size[0],
             total: product.price * 1,
-            unitsInStock: product.units
+            unitsInStock: product.units,
+            discountRate: product?.discountRate ?? null
         });
         toast.success(`added ${product.name.slice(0, 40) + "..."} to cart!`)
     }
@@ -78,7 +83,7 @@ export default function WishlistItem({ product, openConfirmation }: WishlistItem
                     </p>
                 </div>
             </div>
-            <p className="text-neutral-foreground text-sm">${product.price}</p>
+            <p className="text-neutral-foreground text-sm">{convertToCurrency(product.price, DEFAULT_CURRENCY, currency)}</p>
             <Button className='gap-x-2' disabled={isInCart} onClick={(e) => {
                 e.stopPropagation()
                 e.preventDefault();
@@ -89,7 +94,7 @@ export default function WishlistItem({ product, openConfirmation }: WishlistItem
                     isInCart ? (
                         <span className='text-neutral-foreground'>In Cart</span>
                     ) : (
-                        <span className='text-neutral-foreground'>Add to Cart</span>
+                        <span className='text-white'>Add to Cart</span>
                     )
                 }
 

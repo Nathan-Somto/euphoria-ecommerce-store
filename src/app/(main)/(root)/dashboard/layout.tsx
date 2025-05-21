@@ -4,11 +4,15 @@ import { currentSession } from "@/lib/next-auth";
 import { SessionProvider } from "next-auth/react";
 import { checkIfBanned } from "@/utils/checkIfBanned";
 import { redirect } from "next/navigation";
+import { checkIfAdmin } from "@/utils/checkIfAdmin";
 
 export default async function DashboardLayout({ children }: PropsWithChildren) {
     const session = await currentSession()
     if (session && checkIfBanned(session)) {
         redirect('/banned')
+    }
+    if (session && checkIfAdmin(session)) {
+        redirect('/admin')
     }
     return (
         <SessionProvider>

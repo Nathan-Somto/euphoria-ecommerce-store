@@ -20,9 +20,11 @@ type Props<T extends ZodRawShape | {}, U extends Record<string, any>> = {
     belowBtnLink?: string
     belowBtnLinkText?: string
     showSubmitBtn?: boolean
+    customImage?: () => React.ReactNode
     customBelowBtn?: () => React.ReactNode
-    actionFn?: (values: z.infer<z.ZodObject<T>>) => Promise<U>
+    actionFn?: (values: z.infer<z.ZodObject<T>>) => Promise<U> | undefined
     onSubmitCb?: (values: z.infer<z.ZodObject<T>>) => void;
+    disabled?: boolean
 }
 export default function AuthForm<T extends ZodRawShape, U extends Record<string, any>>({
     schema,
@@ -37,8 +39,10 @@ export default function AuthForm<T extends ZodRawShape, U extends Record<string,
     belowBtnLinkText = "",
     showSubmitBtn = true,
     customBelowBtn: BelowBtn,
+    customImage: Image,
     className,
     onSubmitCb = () => void 0,
+    disabled: disabledProp = false,
     actionFn = async (values: z.infer<z.ZodObject<T>>): Promise<U> => ({
         error: "method not implemented",
     } as unknown as U)
@@ -51,6 +55,7 @@ export default function AuthForm<T extends ZodRawShape, U extends Record<string,
     async function onSubmit(values: z.infer<typeof schema>) {
         try {
             const res = await actionFn(values);
+            if (res === undefined) return;
             if (res?.error) {
                 throw new Error(res.message)
             }
@@ -64,7 +69,7 @@ export default function AuthForm<T extends ZodRawShape, U extends Record<string,
 
     }
     // disable button if form is not valid
-    const disabled = !form.formState.isValid
+    const disabled = !form.formState.isValid || disabledProp
     // for submission of form
     const isLoading = form.formState.isLoading || form.formState.isSubmitting
     return (
@@ -72,6 +77,7 @@ export default function AuthForm<T extends ZodRawShape, U extends Record<string,
             <Form {...form}>
                 <form className='px-10 py-8' onSubmit={form.handleSubmit(onSubmit)}>
                     <div className='mb-5'>
+                        {Image && <Image />}
                         <h2 className='text-3xl text-[#333] font-semibold mb-2'>{heading}</h2>
                         <p className='text-[#666666]/80 font-medium text-sm'>{subTitle}</p>
                     </div>

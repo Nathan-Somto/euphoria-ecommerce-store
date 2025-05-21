@@ -22,8 +22,8 @@ export default function CustomDialog({
   return (
     <Dialog
       open={open}
-      onOpenChange={(previousOpen) =>{ 
-        return (typeof setOpen !== "undefined" ? setOpen(!open) : undefined)
+      onOpenChange={(previousOpen) => {
+        return (typeof setOpen !== "undefined" ? setOpen(previousOpen) : undefined)
       }}
     >
       {withTrigger && (
