@@ -12,20 +12,20 @@ export default function NewPasswordPage() {
     const searchParams = useSearchParams();
     const email = searchParams.get('email') ?? '';
     let token = params?.token ?? ''
-    if (Array.isArray(token)){
+    if (Array.isArray(token)) {
         token = token[0]
     }
     return (
         <FeatureFlagGuard
-        flag='NEW_PASSWORD'
-        redirectUrl='/auth/login'
+            flag='NEW_PASSWORD'
+            redirectUrl='/auth/login'
         >
             <AuthForm
                 schema={newPasswordSchema}
                 heading='Create New Password'
                 subTitle='Please enter your new password.'
                 btnText='Reset Password'
-                actionFn={async (values) => await updatePassword(email, token, values.password)}
+                actionFn={async (values) => await updatePassword(email, token as string, values.password)}
                 renderChildren={(form) => (
                     <div className='mb-5'>
                         <FormField

@@ -17,7 +17,7 @@ export default async function OrdersPage(
     page = parseInt(page[0]);
   }
   const { data } = await getAdminOrders(page);
-  console.log("orders data:", JSON.stringify(data, null, 2));
+  //console.log("orders data:", JSON.stringify(data, null, 2));
   return (
     <div>
       <div className="flex items-center justify-between mb-8 mt-16">

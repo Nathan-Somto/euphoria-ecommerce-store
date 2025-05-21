@@ -1,4 +1,15 @@
-import { Body, Html, Button, Text, Tailwind, Row, Column, Img, Container, Section, Link, Head } from '@react-email/components';
+import { Html } from '@react-email/html';
+import { Head } from '@react-email/head';
+import { Body } from '@react-email/body';
+import { Button } from '@react-email/button';
+import { Text } from '@react-email/text';
+import { Tailwind } from '@react-email/tailwind';
+import { Img } from '@react-email/img';
+import { Container } from '@react-email/container';
+import { Section } from '@react-email/section';
+import { Row } from '@react-email/row';
+import { Column } from '@react-email/column';
+import { Link } from '@react-email/link';
 
 type Props = {
     name: string;
