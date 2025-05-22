@@ -1,7 +1,6 @@
-import { authConfig } from "@/lib/next-auth"
-import NextAuth from "next-auth"
-import { NextResponse as Response } from "next/server"
-import { adminRoute, disabledUserRoutes, privateRoutes, publicRoutes, RouteTest } from "./routes"
+import { getToken } from "next-auth/jwt"
+import { NextRequest, NextResponse as Response } from "next/server"
+import { adminRoute, publicRoutes, RouteTest } from "./routes"
 import { getCountryCode } from "./utils/getCountryCode"
 import { setCountryCookie } from "./utils/setCountryCookie"
 // key things to note:
@@ -11,9 +10,10 @@ import { setCountryCookie } from "./utils/setCountryCookie"
 // if the prefix of that route is /admin, i should be redirected to the admin sign in page
 // if i am already signed in, i should not be able to access auth pages
 // if i am logged in as a customer i should not be able to access any admin page or route even sign-in.
-const { auth } = NextAuth(authConfig)
-export default auth(async (req) => {
-    const isLoggedIn = !!req.auth
+
+export default async function middleware(req: NextRequest) {
+    const token = await getToken({ req, secret: process.env.AUTH_SECRET })
+    const isLoggedIn = !!token;
     const url = req.nextUrl;
     const { isRoute: isPublicRoute } = RouteTest(publicRoutes, url.pathname);
     const isAdminRoute = url.pathname.startsWith(adminRoute);
@@ -51,7 +51,7 @@ export default auth(async (req) => {
         }
     })
     return setCountryCookie(response, countryCode);
-})
+}
 export const config = {
     matcher: ["/((?!.+\\.[\\w]+$|_next).*)", "/", "/(api|trpc)(.*)"],
 }
