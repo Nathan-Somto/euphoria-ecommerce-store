@@ -12,7 +12,11 @@ import { setCountryCookie } from "./utils/setCountryCookie"
 // if i am logged in as a customer i should not be able to access any admin page or route even sign-in.
 
 export default async function middleware(req: NextRequest) {
-    const token = await getToken({ req, secret: process.env.AUTH_SECRET })
+    const token = await getToken({
+        req,
+        secret: process.env.AUTH_SECRET,
+        cookieName: process.env.NEXTAUTH_COOKIE_NAME,
+    })
     const isLoggedIn = !!token;
     const url = req.nextUrl;
     const { isRoute: isPublicRoute } = RouteTest(publicRoutes, url.pathname);
