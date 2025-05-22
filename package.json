@@ -4,10 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
     "db:push": "npx prisma db push",
+    "postinstall": "prisma generate",
     "db:studio": "npx prisma studio",
     "email:dev": "email dev --port 8080 --dir ./src/lib/emails",
     "email:build": "email build --dir ./src/lib/emails",
